@@ -36,7 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
             initCorrelationTabs();
         }
         if (typeof initAdvancedVisualizations === 'function') initAdvancedVisualizations();
-        if (typeof initAskThesis === 'function') initAskThesis();
+    if (typeof initAskThesis === 'function') initAskThesis();
+    if (typeof initContentViewer === 'function') initContentViewer();
         
         // Update navigation based on scroll position
         updateActiveNavLinks();
@@ -64,6 +65,7 @@ async function loadAllComponents() {
         { name: 'advanced-visualizations', target: '#advanced-visualizations-container' },
         { name: 'gallery', target: '#gallery-container' },
         { name: 'discussion', target: '#discussion-container' },
+        { name: 'content', target: '#content-container' },
         { name: 'ask', target: '#ask-container' },
         { name: 'conclusion', target: '#conclusion-container' }
     ];

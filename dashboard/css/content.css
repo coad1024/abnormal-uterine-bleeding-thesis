@@ -1,0 +1,11 @@
+/* Thesis Content Reader Styles */
+#content-toc ul li button, #content-toc ul li a { display:block; width:100%; text-align:left; padding:6px 10px; border-radius:6px; line-height:1.25rem; transition:background .15s,color .15s; }
+#content-toc ul li button.active, #content-toc ul li a.active { background: var(--highlight); color:#fff; }
+#content-toc ul li button:not(.active):hover, #content-toc ul li a:not(.active):hover { background: var(--hover-bg, rgba(0,0,0,0.05)); }
+.dark #content-toc ul li button:not(.active):hover { background: rgba(255,255,255,0.08); }
+#content-body h1, #content-body h2, #content-body h3 { scroll-margin-top: 80px; }
+.content-heading-anchor { opacity:0; margin-left:.4rem; font-size:.75em; }
+#content-body h2:hover .content-heading-anchor, #content-body h3:hover .content-heading-anchor { opacity:1; }
+.content-prev-next { display:flex; justify-content:space-between; margin-top:3rem; border-top:1px solid var(--border-color,#e5e7eb); padding-top:1rem; }
+.content-prev-next a { font-size:.8rem; color: var(--highlight); }
+@media (max-width:1024px){ #content-toc { position:relative; top:0; } }

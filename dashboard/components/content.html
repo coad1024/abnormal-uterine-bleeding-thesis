@@ -1,0 +1,26 @@
+<section id="content" class="mb-16 scroll-mt-20">
+  <h2 class="text-3xl font-bold text-center mb-2" style="color: var(--highlight);">Thesis Content</h2>
+  <p class="text-center max-w-3xl mx-auto mb-8" style="color: var(--muted);">Browse the full manuscript in a GitBook-style reader. Select a chapter on the left or open the dedicated reader page.</p>
+  <div class="flex flex-col lg:flex-row gap-6">
+    <aside class="w-full lg:w-1/4">
+      <div class="sticky top-24 card p-4 rounded-lg shadow" id="content-toc">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold tracking-wide uppercase" style="color: var(--muted);">Chapters</h3>
+          <a href="./thesis-content.html" class="text-xs px-2 py-1 rounded bg-teal-600 text-white hover:bg-teal-500" target="_blank" rel="noopener">Open Full</a>
+        </div>
+        <input id="content-filter" type="text" placeholder="Filter..." class="w-full text-xs mb-3 p-2 rounded border dark:bg-gray-800" />
+        <ul id="content-nav" class="space-y-1 text-sm" aria-label="Thesis chapters"></ul>
+      </div>
+    </aside>
+    <div class="flex-1">
+      <div class="card p-6 rounded-lg shadow min-h-[400px]" id="content-viewer" data-initial="Introduction.md">
+        <div id="content-loading" class="text-center py-10 hidden">
+          <div class="loader mx-auto mb-3"></div>
+          <p class="text-sm" style="color: var(--muted);">Loading chapter...</p>
+        </div>
+        <article id="content-body" class="prose dark:prose-invert max-w-none"></article>
+        <div id="content-error" class="hidden mt-6 bg-red-100 dark:bg-red-900/30 p-4 rounded text-red-700 dark:text-red-300 text-sm"></div>
+      </div>
+    </div>
+  </div>
+</section>

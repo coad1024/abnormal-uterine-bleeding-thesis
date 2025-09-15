@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thesis Content Reader</title>
+  <link rel="stylesheet" href="./css/main.css" />
+  <link rel="stylesheet" href="./css/theme.css" />
+  <link rel="stylesheet" href="./css/content.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script defer src="./js/theme.js"></script>
+  <script defer src="./js/content-viewer.js"></script>
+  <style>body{padding:0;margin:0;} header{position:sticky;top:0;z-index:40;background:var(--card-bg);} </style>
+</head>
+<body class="min-h-screen" data-theme="light">
+  <header class="shadow-sm p-4 flex items-center justify-between">
+    <div class="font-bold" style="color: var(--highlight);">AUB Thesis – Full Reader</div>
+    <nav class="flex gap-4 text-sm">
+      <a href="./index.html#content" class="text-teal-600">← Back to Dashboard</a>
+      <button id="theme-toggle" class="p-2 rounded-full" aria-label="Toggle theme"><i class="fas fa-moon dark:hidden"></i><i class="fas fa-sun hidden dark:inline"></i></button>
+    </nav>
+  </header>
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+      <aside class="w-full lg:w-1/5">
+        <div class="card p-4 rounded-lg shadow" id="content-toc">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-xs font-semibold tracking-wide uppercase" style="color: var(--muted);">Chapters</h3>
+          </div>
+          <input id="content-filter" type="text" placeholder="Filter..." class="w-full text-xs mb-3 p-2 rounded border dark:bg-gray-800" />
+          <ul id="content-nav" class="space-y-1 text-sm" aria-label="Thesis chapters"></ul>
+        </div>
+      </aside>
+      <section class="flex-1">
+        <div id="content-viewer" data-initial="Introduction.md" class="card p-6 rounded-lg shadow">
+          <div id="content-loading" class="text-center py-10 hidden"><div class="loader mx-auto mb-3"></div><p class="text-sm" style="color: var(--muted);">Loading chapter...</p></div>
+          <article id="content-body" class="prose dark:prose-invert max-w-none"></article>
+          <div id="content-error" class="hidden mt-6 bg-red-100 dark:bg-red-900/30 p-4 rounded text-red-700 dark:text-red-300 text-sm"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script>document.addEventListener('DOMContentLoaded',()=>{ if (typeof initContentViewer==='function') initContentViewer(); });</script>
+</body>
+</html>
