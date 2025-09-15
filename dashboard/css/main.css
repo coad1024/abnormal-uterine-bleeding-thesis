@@ -1,0 +1,62 @@
+/* Main CSS file that imports all component styles */
+
+/* Import theme variables */
+@import 'theme.css';
+
+/* Import component styles */
+@import 'components.css';
+
+/* Import gallery styles */
+@import 'gallery.css';
+
+/* Global styles */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Additional custom styles */
+section {
+    scroll-margin-top: 4rem;
+}
+
+/* For image gallery */
+.gallery-item img {
+    transition: all 0.3s ease;
+}
+
+.gallery-item:hover img {
+    transform: scale(1.03);
+}
+
+/* For the image modal */
+.modal-overlay {
+    background-color: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(3px);
+}
+
+/* Citations and tooltips */
+.citation {
+    cursor: help;
+    border-bottom: 1px dotted;
+    position: relative;
+}
+
+.tooltip {
+    visibility: hidden;
+    position: absolute;
+    z-index: 10;
+    width: 300px;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    background-color: var(--card-bg);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--card-border);
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+    font-size: 0.875rem;
+}
+
+.citation:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+}

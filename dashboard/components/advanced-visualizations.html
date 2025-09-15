@@ -1,0 +1,56 @@
+<section id="advanced-visualizations" class="mb-16 scroll-mt-20">
+    <h2 class="text-3xl font-bold text-center mb-2" style="color: var(--highlight);">Advanced Data Visualizations</h2>
+    <p class="text-center max-w-3xl mx-auto mb-10" style="color: var(--muted);">
+        Explore these advanced interactive visualizations that provide deeper insights into the relationships between key variables in our study.
+    </p>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Sunburst Diagram -->
+        <div class="card p-6 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-3">Diagnosis Hierarchy</h3>
+            <p class="mb-4" style="color: var(--muted);">This sunburst diagram shows the hierarchical relationship between different diagnoses categories.</p>
+            <div class="visualization-container h-96">
+                <iframe src="../figures/diagnosis_hierarchy_sunburst.html" class="w-full h-full border-0" loading="lazy" title="Diagnosis Hierarchy Sunburst Diagram"></iframe>
+            </div>
+            <button class="mt-4 px-3 py-1 bg-teal-500 text-white rounded hover:bg-teal-600 open-in-new" data-src="../figures/diagnosis_hierarchy_sunburst.html">
+                <i class="fas fa-external-link-alt mr-1"></i> Open Full Screen
+            </button>
+        </div>
+
+        <!-- Age to Diagnosis Sankey -->
+        <div class="card p-6 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-3">Age to Diagnosis Relationships</h3>
+            <p class="mb-4" style="color: var(--muted);">This Sankey diagram visualizes the flow from age groups to specific histopathological diagnoses.</p>
+            <div class="visualization-container h-96">
+                <iframe src="../figures/age_to_diagnosis_sankey.html" class="w-full h-full border-0" loading="lazy" title="Age to Diagnosis Sankey Diagram"></iframe>
+            </div>
+            <button class="mt-4 px-3 py-1 bg-teal-500 text-white rounded hover:bg-teal-600 open-in-new" data-src="../figures/age_to_diagnosis_sankey.html">
+                <i class="fas fa-external-link-alt mr-1"></i> Open Full Screen
+            </button>
+        </div>
+
+        <!-- Log-scale Histopathological Diagnoses -->
+        <div class="card p-6 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-3">Diagnosis Distribution (Log Scale)</h3>
+            <p class="mb-4" style="color: var(--muted);">This log-scale visualization makes it easier to compare diagnoses with vastly different frequencies.</p>
+            <div class="visualization-container h-96">
+                <iframe src="../figures/histopathological_diagnoses_log_interactive.html" class="w-full h-full border-0" loading="lazy" title="Log-Scale Histopathological Diagnoses"></iframe>
+            </div>
+            <button class="mt-4 px-3 py-1 bg-teal-500 text-white rounded hover:bg-teal-600 open-in-new" data-src="../figures/histopathological_diagnoses_log_interactive.html">
+                <i class="fas fa-external-link-alt mr-1"></i> Open Full Screen
+            </button>
+        </div>
+
+        <!-- Common Complaints (Log Scale) -->
+        <div class="card p-6 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-3">Common Complaints (Log Scale)</h3>
+            <p class="mb-4" style="color: var(--muted);">This interactive visualization presents the presenting complaints with a logarithmic scale to better show relationships.</p>
+            <div class="visualization-container h-96">
+                <iframe src="../figures/common_complaints_log_interactive.html" class="w-full h-full border-0" loading="lazy" title="Log-Scale Common Complaints"></iframe>
+            </div>
+            <button class="mt-4 px-3 py-1 bg-teal-500 text-white rounded hover:bg-teal-600 open-in-new" data-src="/figures/common_complaints_log_interactive.html">
+                <i class="fas fa-external-link-alt mr-1"></i> Open Full Screen
+            </button>
+        </div>
+    </div>
+</section>

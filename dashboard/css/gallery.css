@@ -1,0 +1,103 @@
+/* Windows XP style button inspired design */
+.xp-button {
+    background: linear-gradient(to bottom, #e9f0f5 0%, #adccea 60%, #2a95ec 100%);
+    border-radius: 3px;
+    color: #003c74;
+    font-weight: 600;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.5), 
+                inset 0 -1px 0 rgba(0, 60, 116, 0.3);
+    border: 1px solid #5c93cc;
+    transition: all 0.2s ease;
+}
+
+.xp-button:hover {
+    background: linear-gradient(to bottom, #e9f0f5 0%, #adccea 40%, #6dbaff 100%);
+    cursor: pointer;
+}
+
+.xp-button.active {
+    background: linear-gradient(to bottom, #ff9f27 0%, #ffc175 40%, #ff8b00 100%);
+    color: #7e2f00;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border: 1px solid #c67b03;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.5), 
+                inset 0 -1px 0 rgba(126, 47, 0, 0.3);
+}
+
+/* Dark mode overrides */
+.dark .xp-button {
+    background: linear-gradient(to bottom, #2a3c52 0%, #1e293b 60%, #0f172a 100%);
+    color: #e2e8f0;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+    border: 1px solid #334155;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1), 
+                inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.dark .xp-button:hover {
+    background: linear-gradient(to bottom, #334155 0%, #1e293b 40%, #0f172a 100%);
+}
+
+.dark .xp-button.active {
+    background: linear-gradient(to bottom, #c2410c 0%, #ea580c 40%, #9a3412 100%);
+    color: #ffedd5;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+    border: 1px solid #9a3412;
+}
+
+/* Knowledge graph node styles */
+.graph-node {
+    position: absolute;
+    padding: 8px 14px;
+    border-radius: 9999px;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border: 3px solid transparent;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.graph-node:hover {
+    transform: translate(-50%, -50%) scale(1.05);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+
+.graph-node.dimmed {
+    opacity: 0.2;
+}
+
+.graph-node.highlight, .graph-node:hover {
+    border-color: #f59e0b; /* amber-500 */
+    opacity: 1;
+}
+
+.graph-node[data-group="topic"] { background-color: #0f766e; } /* teal-700 */
+.graph-node[data-group="finding"] { background-color: #ea580c; } /* orange-600 */
+.graph-node[data-group="factor"] { background-color: #0284c7; } /* sky-600 */
+.graph-node[data-group="symptom"] { background-color: #d97706; } /* amber-600 */
+.graph-node[data-group="diagnosis"] { background-color: #475569; } /* slate-600 */
+
+/* Skip link styling */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #0d9488;
+    color: white;
+    padding: 8px;
+    z-index: 100;
+    transition: top 0.3s;
+}
+
+.skip-link:focus {
+    top: 0;
+}

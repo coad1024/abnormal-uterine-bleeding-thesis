@@ -1,0 +1,149 @@
+<section id="image-gallery" class="mb-16 scroll-mt-20">
+    <h2 class="text-3xl font-bold text-center mb-2" style="color: var(--highlight);">Histopathological Image Gallery</h2>
+    <p class="text-center max-w-3xl mx-auto mb-10" style="color: var(--muted);">Browse and examine the histopathological images from the study. Click on any image to view it in detail with zoom capabilities.</p>
+    
+    <div class="mb-6">
+        <div class="flex flex-wrap gap-4 mb-4 justify-center" role="toolbar" aria-label="Image filter options">
+            <button class="filter-btn px-4 py-2 xp-button active" data-filter="all" aria-pressed="true" tabindex="0">All Images</button>
+            <button class="filter-btn px-4 py-2 xp-button" data-filter="carcinoma" aria-pressed="false" tabindex="0">Carcinoma</button>
+            <button class="filter-btn px-4 py-2 xp-button" data-filter="hyperplasia" aria-pressed="false" tabindex="0">Hyperplasia</button>
+            <button class="filter-btn px-4 py-2 xp-button" data-filter="endometritis" aria-pressed="false" tabindex="0">Endometritis</button>
+            <button class="filter-btn px-4 py-2 xp-button" data-filter="polyp" aria-pressed="false" tabindex="0">Polyp</button>
+            <button class="filter-btn px-4 py-2 xp-button" data-filter="phase" aria-pressed="false" tabindex="0">Normal Phase</button>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="image-grid" role="region" aria-label="Histopathological images gallery">
+        <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="carcinoma">
+            <img loading="lazy" src="../figures/Figure 1 showing cribriform pattern endometroid carcinoma (100x).png" alt="Cribriform pattern endometroid carcinoma (100x)" class="w-full h-48 object-cover">
+            <div class="p-3 card">
+                <h4 class="font-semibold text-sm">Cribriform Pattern Endometroid Carcinoma</h4>
+                <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+            </div>
+        </div>
+        <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="carcinoma">
+            <img loading="lazy" src="../figures/Figure 2 showing Combination of atypical keratinized squamous cells and malignant endometrial glands- Adenosquamous endometrial carcinoma (100x).png" alt="Adenosquamous endometrial carcinoma (100x)" class="w-full h-48 object-cover">
+            <div class="p-3 card">
+                <h4 class="font-semibold text-sm">Adenosquamous Endometrial Carcinoma</h4>
+                <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+            </div>
+        </div>
+        <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="carcinoma">
+            <img loading="lazy" src="../figures/Figure 3 showing endometroid carcinoma (40x).png" alt="Endometroid carcinoma (40x)" class="w-full h-48 object-cover">
+            <div class="p-3 card">
+                <h4 class="font-semibold text-sm">Endometroid Carcinoma</h4>
+                <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 40x</p>
+            </div>
+        </div>
+        <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="carcinoma">
+            <img loading="lazy" src="../figures/Figure 4 showing endometroid carcinoma (100x).png" alt="Endometroid carcinoma (100x)" class="w-full h-48 object-cover">
+            <div class="p-3 card">
+                <h4 class="font-semibold text-sm">Endometroid Carcinoma</h4>
+                <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+            </div>
+        </div>
+        <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="hyperplasia">
+            <img loading="lazy" src="../figures/Figure 5 showing back to back arrangement of glands with atypia (100x).png" alt="Back to back arrangement of glands with atypia (100x)" class="w-full h-48 object-cover">
+            <div class="p-3 card">
+                <h4 class="font-semibold text-sm">Back to Back Arrangement of Glands with Atypia</h4>
+                <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+            </div>
+        </div>
+        <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="phase">
+            <img loading="lazy" src="../figures/Figure 6 showing pseudodecidualised stroma and atrophied glands(exogenous progesterone effect) 100x.png" alt="Pseudodecidualised stroma (100x)" class="w-full h-48 object-cover">
+            <div class="p-3 card">
+                <h4 class="font-semibold text-sm">Pseudodecidualised Stroma (Progesterone Effect)</h4>
+                <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+            </div>
+        </div>
+        <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="endometritis">
+            <img loading="lazy" src="../figures/Figure 7 showing lymphoplasmacytic  infiltrate in the stroma- chronic Endometritis (40x.png" alt="Chronic Endometritis (40x)" class="w-full h-48 object-cover">
+            <div class="p-3 card">
+                <h4 class="font-semibold text-sm">Lymphoplasmacytic Infiltrate in Chronic Endometritis</h4>
+                <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 40x</p>
+            </div>
+        </div>
+        <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="endometritis">
+            <img loading="lazy" src="../figures/Figure 8 showing chronic Endometritis in the stroma (100x).png" alt="Chronic Endometritis (100x)" class="w-full h-48 object-cover">
+            <div class="p-3 card">
+                <h4 class="font-semibold text-sm">Chronic Endometritis in the Stroma</h4>
+                <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+            </div>
+        </div>
+        <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="polyp">
+            <img loading="lazy" src="../figures/Figure 9 showing Hyperplastic endometrial polyp (40x).png" alt="Hyperplastic endometrial polyp (40x)" class="w-full h-48 object-cover">
+            <div class="p-3 card">
+                <h4 class="font-semibold text-sm">Hyperplastic Endometrial Polyp</h4>
+                <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 40x</p>
+            </div>
+        </div>
+        <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="polyp">
+            <img loading="lazy" src="../figures/Figure 10 showing Endometrial polyp showing variable sized hyperplatic glands and thick walled vessels in the stroma (100x).png" alt="Endometrial polyp (100x)" class="w-full h-48 object-cover">
+            <div class="p-3 card">
+                <h4 class="font-semibold text-sm">Endometrial Polyp with Hyperplatic Glands</h4>
+                <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+            </div>
+        </div>
+        <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="hyperplasia">
+            <img loading="lazy" src="../figures/Figure 11 showing Endometrial hyperplasia without atypia(increase gland to stromal ratio) 100x.png" alt="Endometrial hyperplasia without atypia (100x)" class="w-full h-48 object-cover">
+            <div class="p-3 card">
+                <h4 class="font-semibold text-sm">Endometrial Hyperplasia Without Atypia</h4>
+                <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+            </div>
+        </div>
+        <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="phase">
+            <img loading="lazy" src="../figures/Figure 12 showing pill endometrium( pseudo decidual stroma with secretory glands)progestin effect (100x).png" alt="Pill endometrium (100x)" class="w-full h-48 object-cover">
+            <div class="p-3 card">
+                <h4 class="font-semibold text-sm">Pill Endometrium (Progestin Effect)</h4>
+                <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+            </div>
+        </div>
+        <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="phase">
+            <img loading="lazy" src="../figures/Figure 13 showing secretory phase endometrium (100x).png" alt="Secretory phase endometrium (100x)" class="w-full h-48 object-cover">
+            <div class="p-3 card">
+                <h4 class="font-semibold text-sm">Secretory Phase Endometrium</h4>
+                <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+            </div>
+        </div>
+        <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="phase">
+            <img loading="lazy" src="../figures/Figure 14 showing proliferative phase endometrium (100x).png" alt="Proliferative phase endometrium (100x)" class="w-full h-48 object-cover">
+            <div class="p-3 card">
+                <h4 class="font-semibold text-sm">Proliferative Phase Endometrium</h4>
+                <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+            </div>
+        </div>
+        <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="endometritis">
+            <img loading="lazy" src="../figures/Figure 15 showing caseating granuloma in chronic endometritis (100x).png" alt="Caseating granuloma in chronic endometritis (100x)" class="w-full h-48 object-cover">
+            <div class="p-3 card">
+                <h4 class="font-semibold text-sm">Caseating Granuloma in Chronic Endometritis</h4>
+                <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Modal for zooming and viewing details -->
+    <div id="image-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-full overflow-hidden relative">
+            <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h3 class="font-semibold text-lg">Histopathological Image Detail</h3>
+                <button id="close-modal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none">
+                    <i class="fas fa-times"></i> <span class="sr-only">Close</span>
+                </button>
+            </div>
+            <div class="overflow-auto p-4 flex items-center justify-center" style="height: 70vh;">
+                <img id="modal-image" class="max-h-full transition-transform duration-200" alt="Detailed histopathology image" style="transform-origin: center center;">
+            </div>
+            <div class="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-center gap-4">
+                <button id="zoom-in" class="px-3 py-1 bg-teal-500 text-white rounded hover:bg-teal-600">
+                    <i class="fas fa-search-plus"></i> Zoom In
+                </button>
+                <button id="zoom-out" class="px-3 py-1 bg-teal-500 text-white rounded hover:bg-teal-600">
+                    <i class="fas fa-search-minus"></i> Zoom Out
+                </button>
+                <button id="reset-zoom" class="px-3 py-1 bg-gray-300 text-gray-800 dark:bg-gray-700 dark:text-white rounded hover:bg-gray-400 dark:hover:bg-gray-600">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
+            </div>
+        </div>
+    </div>
+</section>

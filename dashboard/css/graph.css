@@ -1,0 +1,36 @@
+/* Knowledge Graph Styles */
+
+.graph-node {
+    position: absolute;
+    padding: 8px 14px;
+    border-radius: 9999px;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 10;
+    user-select: none;
+}
+
+.graph-node:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 20;
+}
+
+.graph-node.dimmed {
+    opacity: 0.4;
+}
+
+.graph-node.highlight, .graph-node:hover {
+    opacity: 1;
+    z-index: 20;
+}
+
+/* Node group colors */
+.graph-node[data-group="topic"] { background-color: #0f766e; } /* teal-700 */
+.graph-node[data-group="finding"] { background-color: #ea580c; } /* orange-600 */
+.graph-node[data-group="factor"] { background-color: #0284c7; } /* sky-600 */
+.graph-node[data-group="symptom"] { background-color: #d97706; } /* amber-600 */
+.graph-node[data-group="diagnosis"] { background-color: #475569; } /* slate-600 */

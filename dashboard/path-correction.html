@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Path Correction for Dashboard</title>
+    <script>
+        // This script will run when included in the dashboard and fix paths
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Path correction script loaded');
+            
+            // Fix iframe sources
+            document.querySelectorAll('iframe').forEach(function(iframe) {
+                const src = iframe.getAttribute('src');
+                if (src && src.startsWith('/figures/')) {
+                    console.log('Fixing iframe path:', src);
+                    iframe.setAttribute('src', '../figures' + src);
+                }
+            });
+            
+            // Fix image sources
+            document.querySelectorAll('img').forEach(function(img) {
+                const src = img.getAttribute('src');
+                if (src && src.startsWith('/figures/')) {
+                    console.log('Fixing image path:', src);
+                    img.setAttribute('src', '../figures' + src);
+                }
+            });
+            
+            // Fix anchor href attributes
+            document.querySelectorAll('a').forEach(function(a) {
+                const href = a.getAttribute('href');
+                if (href && href.startsWith('/figures/')) {
+                    console.log('Fixing anchor path:', href);
+                    a.setAttribute('href', '../figures' + href);
+                }
+            });
+            
+            console.log('Path correction complete');
+        });
+    </script>
+</head>
+<body>
+    <!-- This is just a utility script - no visible content -->
+</body>
+</html>

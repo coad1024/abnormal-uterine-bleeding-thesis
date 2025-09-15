@@ -1,1 +1,58 @@
-quartz/
+# Ignore quartz directory if that's an external submodule reference (commented out by default)
+# quartz/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.tmp
+~$*
+*.swp
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+build/
+dist/
+.build/
+.venv/
+venv/
+.env
+.env.*
+
+# Node / Frontend (future tooling)
+node_modules/
+*.log
+
+# Notebooks checkpoints
+.ipynb_checkpoints/
+
+# Data / Derived artifacts
+# Keep canonical dataset(s); ignore other CSV exports
+data/*.csv
+!data/Masterchart.csv
+
+# Local retrieval index (rebuildable)
+dashboard/thesis_index.json
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+
+# Generated interactive figure variants
+figures/*_interactive.html
+
+# Temporary analysis outputs
+analysis_output/
+cache/
+
+# Windows
+Desktop.ini
+
+# Git LFS pointer safety (patterns defined in .gitattributes)

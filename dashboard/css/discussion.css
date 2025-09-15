@@ -1,0 +1,62 @@
+/* Discussion section styles */
+
+/* Card styles with higher contrast */
+.discussion-card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.discussion-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Unique styling for each card */
+.age-card {
+    background: linear-gradient(to bottom right, #ffffff, #e6f7f5);
+    border-top: 4px solid #0d9488;
+}
+
+.findings-card {
+    background: linear-gradient(to bottom right, #ffffff, #e6f0ff);
+    border-top: 4px solid #3b82f6;
+}
+
+.correlations-card {
+    background: linear-gradient(to bottom right, #ffffff, #fdf2f8);
+    border-top: 4px solid #ec4899;
+}
+
+/* Dark mode styles */
+.dark .age-card {
+    background: linear-gradient(to bottom right, #1f2937, #134e4a);
+    border-top: 4px solid #14b8a6;
+}
+
+.dark .findings-card {
+    background: linear-gradient(to bottom right, #1f2937, #1e3a8a);
+    border-top: 4px solid #3b82f6;
+}
+
+.dark .correlations-card {
+    background: linear-gradient(to bottom right, #1f2937, #831843);
+    border-top: 4px solid #ec4899;
+}
+
+/* Key finding blockquote */
+.key-finding {
+    background: linear-gradient(135deg, #134e4a, #0d9488);
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(13, 148, 136, 0.3);
+    position: relative;
+    border-left: 10px solid #0f766e;
+    font-weight: 500;
+}
+
+.dark .key-finding {
+    background: linear-gradient(135deg, #0f766e, #115e59);
+    box-shadow: 0 4px 15px rgba(13, 148, 136, 0.5);
+}

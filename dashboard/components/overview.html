@@ -1,0 +1,62 @@
+<section id="overview" class="mb-16">
+    <h1 class="text-4xl font-bold text-center mb-4" style="color: var(--highlight);">Histopathological Patterns in Abnormal Uterine Bleeding (AUB)</h1>
+    <p class="text-center text-lg max-w-3xl mx-auto mb-10" style="color: var(--muted);">This interactive dashboard presents the key findings from a thesis on AUB, exploring the spectrum of endometrial changes and their correlation with patient data to provide a comprehensive diagnostic overview.</p>
+    
+    <div id="ai-summary-container" class="my-8">
+        <div class="text-center">
+            <button id="generate-summary-btn" style="background-color: var(--highlight);" class="text-white font-semibold py-2 px-6 rounded-lg hover:opacity-90 transition shadow-md">✨ Generate AI Summary</button>
+        </div>
+        <div id="summary-loader" class="hidden flex justify-center mt-4"><div class="loader"></div></div>
+        <div id="summary-output" class="mt-6 bg-teal-50 dark:bg-teal-900/30 border-l-4 border-teal-500 p-6 rounded-lg shadow-sm hidden"></div>
+        <div id="summary-error" class="mt-6 bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 text-red-800 dark:text-red-300 p-6 rounded-lg shadow-sm hidden"></div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+        <div class="card p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+            <h3 class="text-4xl font-bold" style="color: var(--highlight);">351</h3>
+            <p class="mt-2" style="color: var(--muted);">Total Patients Studied</p>
+        </div>
+        <div class="card p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+            <h3 class="text-4xl font-bold" style="color: var(--highlight-secondary);">31-40 yrs</h3>
+            <p class="mt-2" style="color: var(--muted);">Most Affected Age Group (47.6%)</p>
+        </div>
+        <div class="card p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+            <h3 class="text-4xl font-bold" style="color: var(--highlight);">Secretory Phase</h3>
+            <p class="mt-2" style="color: var(--muted);">Most Common Finding (29.3%)</p>
+        </div>
+    </div>
+    
+    <div class="mt-8 card p-5 rounded-lg shadow">
+        <h3 class="text-xl font-semibold mb-3">Quick Navigation</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <a href="#demographics" class="flex items-center p-3 rounded-lg bg-gray-50 dark:bg-gray-700 hover:bg-teal-50 dark:hover:bg-teal-900/30 transition group">
+                <div class="mr-3 text-teal-600 dark:text-teal-400"><i class="fas fa-users fa-lg"></i></div>
+                <div>
+                    <h4 class="font-medium group-hover:text-teal-600 dark:group-hover:text-teal-400">Demographics</h4>
+                    <p class="text-sm" style="color: var(--muted);">Patient characteristics</p>
+                </div>
+            </a>
+            <a href="#findings" class="flex items-center p-3 rounded-lg bg-gray-50 dark:bg-gray-700 hover:bg-teal-50 dark:hover:bg-teal-900/30 transition group">
+                <div class="mr-3 text-teal-600 dark:text-teal-400"><i class="fas fa-microscope fa-lg"></i></div>
+                <div>
+                    <h4 class="font-medium group-hover:text-teal-600 dark:group-hover:text-teal-400">Findings</h4>
+                    <p class="text-sm" style="color: var(--muted);">Histopathological results</p>
+                </div>
+            </a>
+            <a href="#correlations" class="flex items-center p-3 rounded-lg bg-gray-50 dark:bg-gray-700 hover:bg-teal-50 dark:hover:bg-teal-900/30 transition group">
+                <div class="mr-3 text-teal-600 dark:text-teal-400"><i class="fas fa-chart-line fa-lg"></i></div>
+                <div>
+                    <h4 class="font-medium group-hover:text-teal-600 dark:group-hover:text-teal-400">Correlations</h4>
+                    <p class="text-sm" style="color: var(--muted);">Statistical relationships</p>
+                </div>
+            </a>
+            <a href="#image-gallery" class="flex items-center p-3 rounded-lg bg-gray-50 dark:bg-gray-700 hover:bg-teal-50 dark:hover:bg-teal-900/30 transition group">
+                <div class="mr-3 text-teal-600 dark:text-teal-400"><i class="fas fa-images fa-lg"></i></div>
+                <div>
+                    <h4 class="font-medium group-hover:text-teal-600 dark:group-hover:text-teal-400">Image Gallery</h4>
+                    <p class="text-sm" style="color: var(--muted);">Histopathological slides</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>

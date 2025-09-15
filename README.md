@@ -35,6 +35,33 @@ To explore this research, you can:
 3.  Examine the figures and images in the **`/figures`** directory.
 4.  Access the raw data for your own analysis from the **`/data`** directory.
 
+### Ask the Thesis (Interactive Q&A)
+
+The dashboard includes a local, privacy-preserving "Ask the Thesis" feature that answers natural language questions by retrieving relevant passages from the manuscript (no external API calls or LLM usage).
+
+Build or refresh the search index whenever you update files in `/manuscript`:
+
+```
+cd "c:/Users/coad1/OneDrive/Desktop/Thesis Figures and descriptions/scripts"
+python build_thesis_index.py
+```
+
+This generates/overwrites `dashboard/thesis_index.json`.
+
+Open/reload the dashboard (e.g. via `enhanced_server.py`) and ask questions like:
+- What were the exclusion criteria?
+- How was data collected?
+- What statistical methods were used?
+- Summarize the main findings.
+
+How it works (technical summary):
+- A Python script tokenizes paragraphs and computes TF (term frequency) + IDF.
+- The client loads `thesis_index.json`, tokenizes the user query, computes a TF-IDF vector, and scores passages via cosine similarity.
+- Top passages are lightly summarized by sentence selection with inline citations `[S1]`, `[S2]`.
+
+If you see "Index Not Built", re-run the build script. The system ignores extremely short or low-signal queries to reduce noise.
+
+
 ## License
 
 This project is licensed under the **MIT License**. See the `LICENSE` file for more details. This means you are free to use, share, and adapt the material, provided you give appropriate credit.

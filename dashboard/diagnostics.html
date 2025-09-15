@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Resource Diagnostics</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #0d9488;
+        }
+        .test-section {
+            margin-bottom: 40px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .status {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        .success {
+            background-color: #d1fae5;
+            color: #047857;
+        }
+        .error {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+        .loading {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .test-item {
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        .test-image {
+            max-width: 100%;
+            height: auto;
+            max-height: 200px;
+            object-fit: contain;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow: auto;
+            font-size: 14px;
+        }
+        button {
+            background-color: #0d9488;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        button:hover {
+            background-color: #0f766e;
+        }
+        .navigation {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dashboard Resource Diagnostics</h1>
+    <p>This tool tests loading resources to diagnose issues with the AUB Thesis Dashboard.</p>
+    
+    <div class="test-section">
+        <h2>1. Test Images from Figures Directory</h2>
+        <p>Testing loading of PNG images from the figures directory:</p>
+        <div class="test-grid" id="image-test-grid">
+            <!-- Images will be added here via JavaScript -->
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Test HTML Visualizations from Figures Directory</h2>
+        <p>Testing loading of HTML visualizations from the figures directory:</p>
+        <div class="test-grid" id="html-test-grid">
+            <!-- HTML tests will be added here via JavaScript -->
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Path Configuration Test</h2>
+        <p>Testing various path configurations to figure out the correct relative paths:</p>
+        <pre id="path-info">Loading path information...</pre>
+    </div>
+    
+    <div class="navigation">
+        <button onclick="window.location.href='/dashboard/'">Return to Dashboard</button>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Test image loading
+            const imageTests = [
+                { name: "Histopathological Diagnoses", path: "../figures/histopathological_diagnoses.png" },
+                { name: "Common Complaints", path: "../figures/common_complaints.png" },
+                { name: "Figure 1", path: "../figures/Figure 1 showing cribriform pattern endometroid carcinoma (100x).png" },
+                { name: "Age Distribution", path: "../figures/age_distribution.png" }
+            ];
+            
+            const imageTestGrid = document.getElementById('image-test-grid');
+            imageTests.forEach(test => {
+                const testItem = document.createElement('div');
+                testItem.className = 'test-item';
+                
+                const heading = document.createElement('h3');
+                heading.textContent = test.name;
+                testItem.appendChild(heading);
+                
+                const status = document.createElement('span');
+                status.className = 'status loading';
+                status.textContent = 'Loading...';
+                heading.appendChild(status);
+                
+                const img = document.createElement('img');
+                img.className = 'test-image';
+                img.alt = test.name;
+                img.onload = function() {
+                    status.className = 'status success';
+                    status.textContent = 'Loaded';
+                };
+                img.onerror = function() {
+                    status.className = 'status error';
+                    status.textContent = 'Failed';
+                };
+                img.src = test.path;
+                
+                testItem.appendChild(img);
+                testItem.appendChild(document.createElement('hr'));
+                
+                const pathInfo = document.createElement('p');
+                pathInfo.textContent = `Path: ${test.path}`;
+                testItem.appendChild(pathInfo);
+                
+                imageTestGrid.appendChild(testItem);
+            });
+            
+            // Test HTML visualization loading
+            const htmlTests = [
+                { name: "Diagnosis Hierarchy", path: "../figures/diagnosis_hierarchy_sunburst.html" },
+                { name: "Age to Diagnosis Sankey", path: "../figures/age_to_diagnosis_sankey.html" },
+                { name: "Diagnoses Log", path: "../figures/histopathological_diagnoses_log_interactive.html" },
+                { name: "Complaints Log", path: "../figures/common_complaints_log_interactive.html" }
+            ];
+            
+            const htmlTestGrid = document.getElementById('html-test-grid');
+            htmlTests.forEach(test => {
+                const testItem = document.createElement('div');
+                testItem.className = 'test-item';
+                
+                const heading = document.createElement('h3');
+                heading.textContent = test.name;
+                testItem.appendChild(heading);
+                
+                const status = document.createElement('span');
+                status.className = 'status loading';
+                status.textContent = 'Loading...';
+                heading.appendChild(status);
+                
+                const iframe = document.createElement('iframe');
+                iframe.style.width = '100%';
+                iframe.style.height = '200px';
+                iframe.style.border = 'none';
+                iframe.onload = function() {
+                    status.className = 'status success';
+                    status.textContent = 'Loaded';
+                };
+                iframe.onerror = function() {
+                    status.className = 'status error';
+                    status.textContent = 'Failed';
+                };
+                iframe.src = test.path;
+                
+                testItem.appendChild(iframe);
+                testItem.appendChild(document.createElement('hr'));
+                
+                const pathInfo = document.createElement('p');
+                pathInfo.textContent = `Path: ${test.path}`;
+                testItem.appendChild(pathInfo);
+                
+                // Add alternative link
+                const altLink = document.createElement('a');
+                altLink.href = test.path;
+                altLink.textContent = 'Open in new tab';
+                altLink.target = '_blank';
+                testItem.appendChild(altLink);
+                
+                htmlTestGrid.appendChild(testItem);
+            });
+            
+            // Show path information
+            const pathInfo = document.getElementById('path-info');
+            const locationInfo = `
+Current location: ${window.location.href}
+Origin: ${window.location.origin}
+Pathname: ${window.location.pathname}
+Base URL: ${document.baseURI}
+`;
+            pathInfo.textContent = locationInfo;
+        });
+    </script>
+</body>
+</html>

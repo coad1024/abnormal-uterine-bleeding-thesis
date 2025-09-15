@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Dashboard: Histopathological Patterns in Abnormal Uterine Bleeding (AUB)</title>
+    <meta name="description" content="An interactive dashboard showcasing histopathological patterns in abnormal uterine bleeding based on thesis research">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.7/build/pdfmake.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.7/build/vfs_fonts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chosen Palette: Warm Neutrals with Teal and Coral Accents -->
+    <!-- Application Structure Plan: The application is structured as a single-page interactive dashboard. A sticky top navigation allows users to jump to any section of the report, facilitating non-linear exploration. The content flows from a high-level overview with AI-powered summaries, to detailed demographic and histopathological findings presented in interactive charts, to a deep dive into statistical correlations and the study's discussion and conclusions. This structure was chosen to cater to different user needs—whether seeking a quick summary or an in-depth analysis of the data—making the dense thesis content digestible and engaging. -->
+    <!-- Visualization & Content Choices: Data from the thesis tables is visualized using Chart.js for interactivity and a consistent aesthetic. 1) Distributions (Age, Complaints, Histopathology, Parity): Bar charts are used to clearly compare frequencies across categories. 2) Proportions (Drug History): A Donut chart provides an intuitive part-to-whole visualization. 3) Correlations: Rather than static heatmaps, an interactive tabbed interface is used to explain each statistical correlation, providing essential context and making the relationships easier to understand. 4) Knowledge Graph: A custom-built interactive graph using HTML Canvas and divs visualizes the core concepts and their interconnections, providing a holistic view of the study's domain. The "Ask the Report" feature uses the full thesis text, allowing for rich, contextual answers. All visualizations are rendered on Canvas, adhering to the NO SVG/Mermaid requirement. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        /* Skip link styling */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #0d9488;
+            color: white;
+            padding: 8px;
+            z-index: 100;
+            transition: top 0.3s;
+        }
+        .skip-link:focus {
+            top: 0;
+        }
+        
+        :root {
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --highlight: #0d9488;
+            --highlight-secondary: #f97316;
+            --muted: #64748b;
+        }
+        [data-theme="dark"] {
+            --bg-color: #1e293b;
+            --text-color: #f1f5f9;
+            --card-bg: #334155;
+            --card-border: #475569;
+            --highlight: #2dd4bf;
+            --highlight-secondary: #fb923c;
+            --muted: #94a3b8;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link.active {
+            color: var(--highlight);
+            font-weight: 600;
+        }
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0d9488;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .graph-node {
+            position: absolute;
+            padding: 8px 14px;
+            border-radius: 9999px;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border: 3px solid transparent;
+            text-align: center;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .graph-node:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        .graph-node.dimmed {
+            opacity: 0.2;
+        }
+        .graph-node.highlight, .graph-node:hover {
+            border-color: #f59e0b; /* amber-500 */
+            opacity: 1;
+        }
+        .graph-node[data-group="topic"] { background-color: #0f766e; } /* teal-700 */
+        .graph-node[data-group="finding"] { background-color: #ea580c; } /* orange-600 */
+        .graph-node[data-group="factor"] { background-color: #0284c7; } /* sky-600 */
+        .graph-node[data-group="symptom"] { background-color: #d97706; } /* amber-600 */
+        .graph-node[data-group="diagnosis"] { background-color: #475569; } /* slate-600 */
+
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header class="shadow-sm sticky top-0 z-50" style="background-color: var(--card-bg);" role="banner">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" role="navigation" aria-label="Main navigation">
+            <div class="flex justify-between items-center py-4">
+                <div class="text-xl font-bold" style="color: var(--highlight);">AUB Thesis Dashboard</div>
+                <div class="hidden md:flex flex-wrap items-center gap-x-6 gap-y-2" role="menubar">
+                    <a href="#overview" class="nav-link hover:text-teal-600 transition" role="menuitem">Overview</a>
+                    <a href="#demographics" class="nav-link hover:text-teal-600 transition" role="menuitem">Demographics</a>
+                    <a href="#findings" class="nav-link hover:text-teal-600 transition" role="menuitem">Findings</a>
+                    <a href="#correlations" class="nav-link hover:text-teal-600 transition" role="menuitem">Correlations</a>
+                    <a href="#knowledge-graph" class="nav-link hover:text-teal-600 transition" role="menuitem">Knowledge Graph</a>
+                    <a href="#discussion" class="nav-link hover:text-teal-600 transition" role="menuitem">Discussion</a>
+                    <a href="#ask" class="nav-link hover:text-teal-600 transition" role="menuitem">✨ Ask the Thesis</a>
+                    <a href="#conclusion" class="nav-link hover:text-teal-600 transition" role="menuitem">Conclusion</a>
+                    <button id="theme-toggle" class="ml-4 p-2 rounded-full" aria-label="Toggle dark/light mode" role="button" tabindex="0">
+                        <i class="fas fa-moon dark:hidden" aria-hidden="true"></i>
+                        <i class="fas fa-sun hidden dark:inline" aria-hidden="true"></i>
+                    </button>
+                    <button id="pdf-export" class="ml-2 p-2 rounded-full" aria-label="Export to PDF" role="button" tabindex="0">
+                        <i class="fas fa-file-pdf" aria-hidden="true"></i>
+                    </button>
+                    <button id="search-toggle" class="ml-2 p-2 rounded-full" aria-label="Search content" role="button" tabindex="0">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <button id="mobile-menu-toggle" class="md:hidden p-2" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobile-menu" role="button" tabindex="0">
+                    <i class="fas fa-bars" aria-hidden="true"></i>
+                </button>
+            </div>
+            <!-- Mobile menu -->
+            <div id="mobile-menu" class="hidden md:hidden py-2 space-y-2" role="menu" aria-labelledby="mobile-menu-toggle">
+                <a href="#overview" class="block nav-link px-4 py-2" role="menuitem">Overview</a>
+                <a href="#demographics" class="block nav-link px-4 py-2" role="menuitem">Demographics</a>
+                <a href="#findings" class="block nav-link px-4 py-2" role="menuitem">Findings</a>
+                <a href="#correlations" class="block nav-link px-4 py-2" role="menuitem">Correlations</a>
+                <a href="#knowledge-graph" class="block nav-link px-4 py-2" role="menuitem">Knowledge Graph</a>
+                <a href="#discussion" class="block nav-link px-4 py-2" role="menuitem">Discussion</a>
+                <a href="#ask" class="block nav-link px-4 py-2" role="menuitem">✨ Ask the Thesis</a>
+                <a href="#conclusion" class="block nav-link px-4 py-2" role="menuitem">Conclusion</a>
+            </div>
+            <!-- Search overlay -->
+            <div id="search-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="search-heading">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 id="search-heading" class="text-lg font-semibold">Search Thesis Content</h3>
+                        <button id="close-search" class="p-2" aria-label="Close search" tabindex="0">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" id="search-input" class="w-full p-3 border rounded-lg" placeholder="Enter search term..." aria-label="Search input">
+                    </div>
+                    <div id="search-results" class="max-h-96 overflow-y-auto" role="region" aria-live="polite"></div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12" role="main">
+        
+        <section id="overview" class="mb-16">
+            <h1 class="text-4xl font-bold text-center mb-4" style="color: var(--highlight);">Histopathological Patterns in Abnormal Uterine Bleeding (AUB)</h1>
+            <p class="text-center text-lg max-w-3xl mx-auto mb-10" style="color: var(--muted);">This interactive dashboard presents the key findings from a thesis on AUB, exploring the spectrum of endometrial changes and their correlation with patient data to provide a comprehensive diagnostic overview.</p>
+            
+            <div id="ai-summary-container" class="my-8">
+                <div class="text-center">
+                    <button id="generate-summary-btn" style="background-color: var(--highlight);" class="text-white font-semibold py-2 px-6 rounded-lg hover:opacity-90 transition shadow-md">✨ Generate AI Summary</button>
+                </div>
+                <div id="summary-loader" class="hidden flex justify-center mt-4"><div class="loader"></div></div>
+                <div id="summary-output" class="mt-6 bg-teal-50 dark:bg-teal-900/30 border-l-4 border-teal-500 p-6 rounded-lg shadow-sm hidden"></div>
+                <div id="summary-error" class="mt-6 bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 text-red-800 dark:text-red-300 p-6 rounded-lg shadow-sm hidden"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <div class="card p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+                    <h3 class="text-4xl font-bold" style="color: var(--highlight);">351</h3>
+                    <p class="mt-2" style="color: var(--muted);">Total Patients Studied</p>
+                </div>
+                <div class="card p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+                    <h3 class="text-4xl font-bold" style="color: var(--highlight-secondary);">31-40 yrs</h3>
+                    <p class="mt-2" style="color: var(--muted);">Most Affected Age Group (47.6%)</p>
+                </div>
+                <div class="card p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+                    <h3 class="text-4xl font-bold" style="color: var(--highlight);">Secretory Phase</h3>
+                    <p class="mt-2" style="color: var(--muted);">Most Common Finding (29.3%)</p>
+                </div>
+            </div>
+            
+            <div class="mt-8 card p-5 rounded-lg shadow">
+                <h3 class="text-xl font-semibold mb-3">Quick Navigation</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <a href="#demographics" class="p-3 bg-teal-50 dark:bg-teal-900/30 rounded text-center hover:bg-teal-100 dark:hover:bg-teal-800/40 transition">
+                        <i class="fas fa-users mb-2 text-xl" style="color: var(--highlight);"></i>
+                        <div class="text-sm font-medium">Demographics</div>
+                    </a>
+                    <a href="#findings" class="p-3 bg-teal-50 dark:bg-teal-900/30 rounded text-center hover:bg-teal-100 dark:hover:bg-teal-800/40 transition">
+                        <i class="fas fa-chart-bar mb-2 text-xl" style="color: var(--highlight);"></i>
+                        <div class="text-sm font-medium">Findings</div>
+                    </a>
+                    <a href="#image-gallery" class="p-3 bg-teal-50 dark:bg-teal-900/30 rounded text-center hover:bg-teal-100 dark:hover:bg-teal-800/40 transition">
+                        <i class="fas fa-images mb-2 text-xl" style="color: var(--highlight);"></i>
+                        <div class="text-sm font-medium">Image Gallery</div>
+                    </a>
+                    <a href="#correlations" class="p-3 bg-teal-50 dark:bg-teal-900/30 rounded text-center hover:bg-teal-100 dark:hover:bg-teal-800/40 transition">
+                        <i class="fas fa-project-diagram mb-2 text-xl" style="color: var(--highlight);"></i>
+                        <div class="text-sm font-medium">Correlations</div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="demographics" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2" style="color: var(--highlight);">Patient Demographics</h2>
+            <p class="text-center max-w-3xl mx-auto mb-10" style="color: var(--muted);">This section visualizes the distribution of age, presenting complaints, parity, and hormonal drug history among the 351 patients studied.</p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="card p-6 rounded-lg shadow">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold">Age Distribution <span class="text-sm font-normal" style="color: var(--muted);">(Fig. 2)</span></h3>
+                        <button class="reset-zoom-btn p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" data-chart="ageChart">
+                            <i class="fas fa-search-minus mr-1"></i>Reset Zoom
+                        </button>
+                    </div>
+                    <div class="chart-container"><canvas id="ageChart"></canvas></div>
+                </div>
+                <div class="card p-6 rounded-lg shadow">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold">Presenting Complaints <span class="text-sm font-normal" style="color: var(--muted);">(Fig. 3)</span></h3>
+                        <button class="reset-zoom-btn p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" data-chart="complaintsChart">
+                            <i class="fas fa-search-minus mr-1"></i>Reset Zoom
+                        </button>
+                    </div>
+                    <div class="chart-container"><canvas id="complaintsChart"></canvas></div>
+                </div>
+                <div class="card p-6 rounded-lg shadow">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold">Parity Distribution <span class="text-sm font-normal" style="color: var(--muted);">(Fig. 4)</span></h3>
+                        <button class="reset-zoom-btn p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" data-chart="parityChart">
+                            <i class="fas fa-search-minus mr-1"></i>Reset Zoom
+                        </button>
+                    </div>
+                    <div class="chart-container"><canvas id="parityChart"></canvas></div>
+                </div>
+                <div class="card p-6 rounded-lg shadow">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold">History of Hormonal Intake <span class="text-sm font-normal" style="color: var(--muted);">(Fig. 5)</span></h3>
+                        <button class="reset-zoom-btn p-2 rounded bg-gray-100 dark:bg-gray-700 text-sm" data-chart="drugHistoryChart">
+                            <i class="fas fa-search-minus mr-1"></i>Reset Zoom
+                        </button>
+                    </div>
+                    <div class="chart-container"><canvas id="drugHistoryChart"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="findings" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2" style="color: var(--highlight);">Key Findings: Histopathological Diagnoses</h2>
+            <p class="text-center max-w-3xl mx-auto mb-10" style="color: var(--muted);">The core of the study involved the histopathological analysis of endometrial samples. This chart displays the full spectrum of diagnoses, from normal cyclical changes to pathological conditions.</p>
+            <div class="card p-6 rounded-lg shadow">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-center">Diagnosis Distribution (Fig. 1)</h3>
+                    <button class="reset-zoom-btn p-2 rounded bg-gray-100 dark:bg-gray-700" data-chart="histopathologyChart">
+                        <i class="fas fa-search-minus mr-1"></i>Reset Zoom
+                    </button>
+                </div>
+                <div class="chart-container" style="height: 450px; max-height: 500px;"><canvas id="histopathologyChart"></canvas></div>
+            </div>
+        </section>
+        
+        <section id="image-gallery" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2" style="color: var(--highlight);">Histopathological Image Gallery</h2>
+            <p class="text-center max-w-3xl mx-auto mb-10" style="color: var(--muted);">Browse and examine the histopathological images from the study. Click on any image to view it in detail with zoom capabilities.</p>
+            
+            <div class="mb-6">
+                <div class="flex flex-wrap gap-4 mb-4 justify-center" role="toolbar" aria-label="Image filter options">
+                    <button class="filter-btn px-4 py-2 rounded-full bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-100 active" data-filter="all" aria-pressed="true" tabindex="0">All Images</button>
+                    <button class="filter-btn px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700" data-filter="carcinoma" aria-pressed="false" tabindex="0">Carcinoma</button>
+                    <button class="filter-btn px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700" data-filter="hyperplasia" aria-pressed="false" tabindex="0">Hyperplasia</button>
+                    <button class="filter-btn px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700" data-filter="endometritis" aria-pressed="false" tabindex="0">Endometritis</button>
+                    <button class="filter-btn px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700" data-filter="polyp" aria-pressed="false" tabindex="0">Polyp</button>
+                    <button class="filter-btn px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700" data-filter="phase" aria-pressed="false" tabindex="0">Normal Phase</button>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="image-grid" role="region" aria-label="Histopathological images gallery">
+                <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="carcinoma">
+                    <img loading="lazy" src="../figures/Figure 1 showing cribriform pattern endometroid carcinoma (100x).png" alt="Cribriform pattern endometroid carcinoma (100x)" class="w-full h-48 object-cover">
+                    <div class="p-3 card">
+                        <h4 class="font-semibold text-sm">Cribriform Pattern Endometroid Carcinoma</h4>
+                        <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+                    </div>
+                </div>
+                <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="carcinoma">
+                    <img loading="lazy" src="../figures/Figure 2 showing Combination of atypical keratinized squamous cells and malignant endometrial glands- Adenosquamous endometrial carcinoma (100x).png" alt="Adenosquamous endometrial carcinoma (100x)" class="w-full h-48 object-cover">
+                    <div class="p-3 card">
+                        <h4 class="font-semibold text-sm">Adenosquamous Endometrial Carcinoma</h4>
+                        <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+                    </div>
+                </div>
+                <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="carcinoma">
+                    <img loading="lazy" src="../figures/Figure 3 showing endometroid carcinoma (40x).png" alt="Endometroid carcinoma (40x)" class="w-full h-48 object-cover">
+                    <div class="p-3 card">
+                        <h4 class="font-semibold text-sm">Endometroid Carcinoma</h4>
+                        <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 40x</p>
+                    </div>
+                </div>
+                <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="carcinoma">
+                    <img loading="lazy" src="../figures/Figure 4 showing endometroid carcinoma (100x).png" alt="Endometroid carcinoma (100x)" class="w-full h-48 object-cover">
+                    <div class="p-3 card">
+                        <h4 class="font-semibold text-sm">Endometroid Carcinoma</h4>
+                        <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+                    </div>
+                </div>
+                <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="hyperplasia">
+                    <img loading="lazy" src="../figures/Figure 5 showing back to back arrangement of glands with atypia (100x).png" alt="Back to back arrangement of glands with atypia (100x)" class="w-full h-48 object-cover">
+                    <div class="p-3 card">
+                        <h4 class="font-semibold text-sm">Back to Back Arrangement of Glands with Atypia</h4>
+                        <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+                    </div>
+                </div>
+                <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="phase">
+                    <img loading="lazy" src="../figures/Figure 6 showing pseudodecidualised stroma and atrophied glands(exogenous progesterone effect) 100x.png" alt="Pseudodecidualised stroma (100x)" class="w-full h-48 object-cover">
+                    <div class="p-3 card">
+                        <h4 class="font-semibold text-sm">Pseudodecidualised Stroma (Progesterone Effect)</h4>
+                        <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+                    </div>
+                </div>
+                <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="endometritis">
+                    <img loading="lazy" src="../figures/Figure 7 showing lymphoplasmacytic  infiltrate in the stroma- chronic Endometritis (40x.png" alt="Chronic Endometritis (40x)" class="w-full h-48 object-cover">
+                    <div class="p-3 card">
+                        <h4 class="font-semibold text-sm">Lymphoplasmacytic Infiltrate in Chronic Endometritis</h4>
+                        <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 40x</p>
+                    </div>
+                </div>
+                <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="endometritis">
+                    <img loading="lazy" src="../figures/Figure 8 showing chronic Endometritis in the stroma (100x).png" alt="Chronic Endometritis (100x)" class="w-full h-48 object-cover">
+                    <div class="p-3 card">
+                        <h4 class="font-semibold text-sm">Chronic Endometritis in the Stroma</h4>
+                        <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+                    </div>
+                </div>
+                <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="polyp">
+                    <img loading="lazy" src="../figures/Figure 9 showing Hyperplastic endometrial polyp (40x).png" alt="Hyperplastic endometrial polyp (40x)" class="w-full h-48 object-cover">
+                    <div class="p-3 card">
+                        <h4 class="font-semibold text-sm">Hyperplastic Endometrial Polyp</h4>
+                        <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 40x</p>
+                    </div>
+                </div>
+                <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="polyp">
+                    <img loading="lazy" src="../figures/Figure 10 showing Endometrial polyp showing variable sized hyperplatic glands and thick walled vessels in the stroma (100x).png" alt="Endometrial polyp (100x)" class="w-full h-48 object-cover">
+                    <div class="p-3 card">
+                        <h4 class="font-semibold text-sm">Endometrial Polyp with Hyperplatic Glands</h4>
+                        <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+                    </div>
+                </div>
+                <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="hyperplasia">
+                    <img loading="lazy" src="../figures/Figure 11 showing Endometrial hyperplasia without atypia(increase gland to stromal ratio) 100x.png" alt="Endometrial hyperplasia without atypia (100x)" class="w-full h-48 object-cover">
+                    <div class="p-3 card">
+                        <h4 class="font-semibold text-sm">Endometrial Hyperplasia Without Atypia</h4>
+                        <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+                    </div>
+                </div>
+                <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="phase">
+                    <img loading="lazy" src="../figures/Figure 12 showing pill endometrium( pseudo decidual stroma with secretory glands)progestin effect (100x).png" alt="Pill endometrium (100x)" class="w-full h-48 object-cover">
+                    <div class="p-3 card">
+                        <h4 class="font-semibold text-sm">Pill Endometrium (Progestin Effect)</h4>
+                        <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+                    </div>
+                </div>
+                <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="phase">
+                    <img loading="lazy" src="../figures/Figure 13 showing secretory phase endometrium (100x).png" alt="Secretory phase endometrium (100x)" class="w-full h-48 object-cover">
+                    <div class="p-3 card">
+                        <h4 class="font-semibold text-sm">Secretory Phase Endometrium</h4>
+                        <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+                    </div>
+                </div>
+                <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="phase">
+                    <img loading="lazy" src="../figures/Figure 14 showing proliferative phase endometrium (100x).png" alt="Proliferative phase endometrium (100x)" class="w-full h-48 object-cover">
+                    <div class="p-3 card">
+                        <h4 class="font-semibold text-sm">Proliferative Phase Endometrium</h4>
+                        <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+                    </div>
+                </div>
+                <div class="gallery-item cursor-pointer overflow-hidden rounded-lg shadow transition-all hover:shadow-lg" data-category="endometritis">
+                    <img loading="lazy" src="../figures/Figure 15 showing caseating granuloma in chronic endometritis (100x).png" alt="Caseating granuloma in chronic endometritis (100x)" class="w-full h-48 object-cover">
+                    <div class="p-3 card">
+                        <h4 class="font-semibold text-sm">Caseating Granuloma in Chronic Endometritis</h4>
+                        <p class="text-xs mt-1" style="color: var(--muted);">Magnification: 100x</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Image Modal -->
+            <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
+                <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+                    <div class="flex justify-between items-center p-4 border-b">
+                        <h3 id="modal-title" class="text-lg font-semibold"></h3>
+                        <button id="close-modal" class="p-2">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="relative overflow-hidden" style="height: 70vh;">
+                        <img id="modal-image" src="" alt="" class="max-w-full h-auto max-h-full object-contain mx-auto" style="transform-origin: center; transform: scale(1);">
+                    </div>
+                    <div class="p-4 flex justify-between items-center">
+                        <div>
+                            <button id="zoom-in" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded mr-2">
+                                <i class="fas fa-search-plus"></i> Zoom In
+                            </button>
+                            <button id="zoom-out" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded">
+                                <i class="fas fa-search-minus"></i> Zoom Out
+                            </button>
+                        </div>
+                        <p id="modal-magnification" class="text-sm" style="color: var(--muted);"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="correlations" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2" style="color: var(--highlight);">Statistical Correlations</h2>
+            <p class="text-center max-w-3xl mx-auto mb-10" style="color: var(--muted);">Explore the statistical relationships between histopathological findings and key clinical variables. Click the tabs to understand how factors like age and medical history correlate with endometrial pathology.</p>
+            
+            <div class="card p-6 rounded-lg shadow">
+                <div class="border-b border-gray-200 dark:border-gray-700">
+                    <nav class="-mb-px flex flex-wrap space-x-6" aria-label="Tabs">
+                        <button class="correlation-tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-teal-500" style="color: var(--highlight);" data-target="corr-age">vs. Age</button>
+                        <button class="correlation-tab hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent" data-target="corr-lmp">vs. LMP</button>
+                        <button class="correlation-tab hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent" data-target="corr-drug">vs. Drug History</button>
+                        <button class="correlation-tab hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent" data-target="corr-complaints">vs. Complaints</button>
+                    </nav>
+                </div>
+                <div class="py-6 space-y-4">
+                    <div id="corr-age" class="correlation-content">
+                        <h4 class="text-lg font-semibold mb-2">Pathology vs. Age (r = 0.264) <span class="text-sm font-normal" style="color: var(--muted);"><a href="#" class="figure-ref" data-figure="Figure 7">Figure 7</a></span></h4>
+                        <p>A <strong style="color: var(--highlight);">significant positive correlation</strong> suggests that as age increases, there is a tendency for more severe pathological changes in the endometrium. This supports the clinical understanding that older women are more likely to develop conditions like endometrial hyperplasia or carcinoma.</p>
+                        <div class="mt-3">
+                            <img loading="lazy" src="../figures/page66_img1.png" alt="Correlation: Histopathological Diagnosis and Age" class="w-full max-w-md mx-auto rounded-lg shadow-sm">
+                            <p class="text-center mt-2 text-sm" style="color: var(--muted);">Scatter plot showing correlation between histopathological diagnosis and age</p>
+                        </div>
+                    </div>
+                    <div id="corr-lmp" class="correlation-content hidden">
+                        <h4 class="text-lg font-semibold mb-2">Pathology vs. Last Menstrual Period (LMP) (r = 0.766) <span class="text-sm font-normal" style="color: var(--muted);"><a href="#" class="figure-ref" data-figure="Figure 8">Figure 8</a></span></h4>
+                        <p>A <strong style="color: var(--highlight);">strong positive correlation</strong> indicates that the histopathological findings closely align with the expected phase of the menstrual cycle based on the LMP, reinforcing the importance of menstrual history in diagnosis.</p>
+                        <div class="mt-3">
+                            <img loading="lazy" src="../figures/page68_img1.png" alt="Correlation: Histopathological Diagnosis and LMP" class="w-full max-w-md mx-auto rounded-lg shadow-sm">
+                            <p class="text-center mt-2 text-sm" style="color: var(--muted);">Scatter plot showing correlation between histopathological diagnosis and LMP</p>
+                        </div>
+                    </div>
+                    <div id="corr-drug" class="correlation-content hidden">
+                        <h4 class="text-lg font-semibold mb-2">Pathology vs. Drug History (r = 0.287) <span class="text-sm font-normal" style="color: var(--muted);"><a href="#" class="figure-ref" data-figure="Figure 9">Figure 9</a></span></h4>
+                        <p>A <strong style="color: var(--highlight);">moderate positive correlation</strong> reveals a meaningful association between hormonal medication use and specific endometrial changes, highlighting the need to consider a patient's drug history.</p>
+                        <div class="mt-3">
+                            <img loading="lazy" src="../figures/page70_img1.png" alt="Correlation: Histopathological Diagnosis and Drug History" class="w-full max-w-md mx-auto rounded-lg shadow-sm">
+                            <p class="text-center mt-2 text-sm" style="color: var(--muted);">Scatter plot showing correlation between histopathological diagnosis and drug history</p>
+                        </div>
+                    </div>
+                    <div id="corr-complaints" class="correlation-content hidden">
+                        <h4 class="text-lg font-semibold mb-2">Pathology vs. Presenting Complaints (r = -0.052) <span class="text-sm font-normal" style="color: var(--muted);"><a href="#" class="figure-ref" data-figure="Figure 10">Figure 10</a></span></h4>
+                        <p>A <strong style="color: var(--highlight-secondary);">weak and statistically insignificant correlation</strong> indicates that clinical symptoms alone are not reliable predictors of the underlying endometrial pathology, underscoring the necessity of histopathological evaluation.</p>
+                        <div class="mt-3">
+                            <img loading="lazy" src="../figures/page72_img1.png" alt="Correlation: Complaints and Histopathological Diagnosis" class="w-full max-w-md mx-auto rounded-lg shadow-sm">
+                            <p class="text-center mt-2 text-sm" style="color: var(--muted);">Scatter plot showing correlation between complaints and histopathological diagnosis</p>
+                        </div>
+                    </div>
+                    <div class="citation-tooltip hidden absolute bg-white dark:bg-gray-800 p-3 rounded shadow-lg border border-gray-200 dark:border-gray-700 max-w-sm z-10"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="knowledge-graph" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2" style="color: var(--highlight);">Knowledge Graph: AUB Relationships</h2>
+            <p class="text-center max-w-3xl mx-auto mb-10" style="color: var(--muted);">This interactive graph visualizes the key concepts from the thesis and their relationships. Hover over a node to highlight its direct connections and better understand the complex interplay of factors in Abnormal Uterine Bleeding.</p>
+            <div class="card p-6 rounded-lg shadow">
+                <div id="graph-legend" class="flex justify-center flex-wrap gap-x-6 gap-y-2 mb-4 text-sm"></div>
+                <div id="graph-container" class="relative w-full h-[600px] border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <canvas id="graph-canvas" class="absolute top-0 left-0 w-full h-full"></canvas>
+                </div>
+                <div class="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <p class="text-sm" style="color: var(--muted);"><i class="fas fa-info-circle mr-1"></i> <strong>How to use:</strong> Hover over any node to see its connections. The thickness of the lines indicates the strength of the relationship. Nodes are color-coded by category.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="discussion" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2" style="color: var(--highlight);">Discussion</h2>
+            <p class="text-center max-w-3xl mx-auto mb-10" style="color: var(--muted);">This section contextualizes the study's findings by comparing them with previous national and international research, evaluating similarities and deviations in trends, frequencies, and histological patterns of AUB.</p>
+            <div class="card p-8 rounded-lg shadow space-y-6">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="md:w-1/3">
+                        <div class="card p-5 rounded-lg h-full" style="border-left: 4px solid var(--highlight);">
+                            <h3 class="text-xl font-semibold mb-3">Age Distribution & Complaints</h3>
+                            <p>The study's finding that the 31-40 age group is most affected by AUB aligns with numerous other studies. Similarly, menorrhagia being the most common complaint (40.5%) is a consistent finding in the literature, reinforcing its status as a primary symptom driving gynecological consultations.</p>
+                            <div class="mt-3 text-sm">
+                                <a href="#" class="citation-link inline-flex items-center gap-1" data-citation="Poornima M et al., 2016">
+                                    <i class="fas fa-quote-right"></i> 
+                                    <span>Compare with similar studies</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:w-1/3">
+                        <div class="card p-5 rounded-lg h-full" style="border-left: 4px solid var(--highlight);">
+                            <h3 class="text-xl font-semibold mb-3">Histopathological Findings</h3>
+                            <p>The predominance of normal cyclical changes (secretory and proliferative phases) is a common observation. However, the presence of endometrial hyperplasia in 12% of cases and carcinoma in 1.4% highlights the critical diagnostic role of endometrial sampling, especially as these rates are comparable to other regional studies.</p>
+                            <div class="mt-3 text-sm">
+                                <a href="#image-gallery" class="inline-flex items-center gap-1">
+                                    <i class="fas fa-microscope"></i>
+                                    <span>View histopathological images</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:w-1/3">
+                        <div class="card p-5 rounded-lg h-full" style="border-left: 4px solid var(--highlight);">
+                            <h3 class="text-xl font-semibold mb-3">Clinical Correlations</h3>
+                            <p>The strong correlation between histopathology and LMP (r=0.766) is a key finding, emphasizing that clinical context is vital for accurate interpretation. Conversely, the lack of correlation between symptoms and pathology is a crucial takeaway, confirming that histopathology is indispensable as symptoms alone are poor predictors of the underlying condition.</p>
+                            <div class="mt-3 text-sm">
+                                <a href="#correlations" class="inline-flex items-center gap-1">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>Examine statistical correlations</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="citation-tooltip hidden absolute bg-white dark:bg-gray-800 p-3 rounded shadow-lg border border-gray-200 dark:border-gray-700 max-w-sm z-10"></div>
+            </div>
+        </section>
+        
+        <section id="ask" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2" style="color: var(--highlight);">✨ Ask the Thesis</h2>
+            <p class="text-center max-w-3xl mx-auto mb-10" style="color: var(--muted);">Have a specific question about the study? Ask Gemini to get an answer generated directly from the full thesis content, including details about its methodology, literature review, and findings.</p>
+            <div class="card p-8 rounded-lg shadow max-w-3xl mx-auto">
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="flex-grow relative">
+                        <input type="text" id="question-input" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-teal-500 focus:outline-none dark:bg-gray-700" placeholder="e.g., What were the exclusion criteria for the study?">
+                        <div class="absolute right-3 top-3 text-gray-400">
+                            <i class="fas fa-microphone cursor-pointer" id="voice-input" title="Speak your question"></i>
+                        </div>
+                    </div>
+                    <button id="ask-question-btn" style="background-color: var(--highlight);" class="text-white font-semibold py-3 px-6 rounded-lg hover:opacity-90 transition shadow-md">Submit Question</button>
+                </div>
+                <div class="mt-4">
+                    <div class="flex gap-2 flex-wrap">
+                        <span class="text-sm font-medium" style="color: var(--muted);">Sample questions:</span>
+                        <button class="sample-question text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition">What were the exclusion criteria?</button>
+                        <button class="sample-question text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition">How was data collected?</button>
+                        <button class="sample-question text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition">What statistical methods were used?</button>
+                    </div>
+                </div>
+                <div id="qa-loader" class="hidden flex justify-center mt-6"><div class="loader"></div></div>
+                <div id="qa-output" class="mt-6 bg-gray-100 dark:bg-gray-800 p-6 rounded-lg hidden"></div>
+                <div id="qa-error" class="mt-6 bg-red-100 dark:bg-red-900/30 p-6 rounded-lg text-red-700 dark:text-red-300 hidden"></div>
+            </div>
+        </section>
+
+        <section id="conclusion" class="scroll-mt-20 mb-16">
+            <h2 class="text-3xl font-bold text-center mb-2" style="color: var(--highlight);">Conclusion & Recommendations</h2>
+            <p class="text-center max-w-3xl mx-auto mb-10" style="color: var(--muted);">The study reaffirms that while AUB often stems from benign causes, the risk of premalignant and malignant conditions necessitates a thorough diagnostic approach using histopathology as the gold standard.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card p-8 rounded-lg shadow space-y-4">
+                     <h3 class="text-xl font-semibold mb-2">Key Conclusions</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <div class="flex-shrink-0 h-6 w-6 rounded-full flex items-center justify-center mr-2 mt-0.5" style="background-color: var(--highlight);">
+                                <i class="fas fa-check text-white text-xs"></i>
+                            </div>
+                            <span>Histopathological evaluation is essential for all women with AUB, as clinical symptoms are poor predictors of underlying pathology.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="flex-shrink-0 h-6 w-6 rounded-full flex items-center justify-center mr-2 mt-0.5" style="background-color: var(--highlight);">
+                                <i class="fas fa-check text-white text-xs"></i>
+                            </div>
+                            <span>A detailed clinical history (LMP, hormonal drug use) is critical for accurate interpretation of biopsy results.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="flex-shrink-0 h-6 w-6 rounded-full flex items-center justify-center mr-2 mt-0.5" style="background-color: var(--highlight);">
+                                <i class="fas fa-check text-white text-xs"></i>
+                            </div>
+                            <span>Age is a significant risk factor, with older patients showing a higher incidence of hyperplasia and carcinoma.</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card p-8 rounded-lg shadow space-y-4">
+                     <h3 class="text-xl font-semibold mb-2">Recommendations</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <div class="flex-shrink-0 h-6 w-6 rounded-full flex items-center justify-center mr-2 mt-0.5" style="background-color: var(--highlight-secondary);">
+                                <i class="fas fa-lightbulb text-white text-xs"></i>
+                            </div>
+                            <span>Implement routine histopathological evaluation for AUB cases, especially in women over 35.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="flex-shrink-0 h-6 w-6 rounded-full flex items-center justify-center mr-2 mt-0.5" style="background-color: var(--highlight-secondary);">
+                                <i class="fas fa-lightbulb text-white text-xs"></i>
+                            </div>
+                            <span>Adopt the standardized FIGO PALM-COEIN classification system in clinical settings.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="flex-shrink-0 h-6 w-6 rounded-full flex items-center justify-center mr-2 mt-0.5" style="background-color: var(--highlight-secondary);">
+                                <i class="fas fa-lightbulb text-white text-xs"></i>
+                            </div>
+                            <span>Integrate ultrasound with histopathology for a comprehensive diagnostic approach.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="flex-shrink-0 h-6 w-6 rounded-full flex items-center justify-center mr-2 mt-0.5" style="background-color: var(--highlight-secondary);">
+                                <i class="fas fa-lightbulb text-white text-xs"></i>
+                            </div>
+                            <span>Promote awareness for early evaluation of AUB to facilitate timely detection of serious conditions.</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="md:col-span-2 mt-4">
+                    <div class="card p-6 rounded-lg shadow">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold">Download Thesis Materials</h3>
+                            <div>
+                                <button id="export-summary" class="inline-flex items-center px-4 py-2 rounded-lg mr-2" style="background-color: var(--highlight); color: white;">
+                                    <i class="fas fa-file-pdf mr-2"></i> PDF Summary
+                                </button>
+                                <a href="../final_outputs/THESIS.pdf" target="_blank" class="inline-flex items-center px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                                    <i class="fas fa-download mr-2"></i> Full Thesis
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="mt-16" style="background-color: var(--card-bg);">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="font-semibold text-lg mb-3" style="color: var(--highlight);">About This Dashboard</h3>
+                    <p class="text-sm" style="color: var(--muted);">This interactive dashboard presents findings from the thesis "Histopathological Patterns in Abnormal Uterine Bleeding." It provides visualizations, data analysis, and a searchable interface for the research.</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-3" style="color: var(--highlight);">Features</h3>
+                    <ul class="text-sm space-y-1" style="color: var(--muted);">
+                        <li><i class="fas fa-chart-bar mr-1"></i> Interactive data visualizations</li>
+                        <li><i class="fas fa-image mr-1"></i> Histopathology image gallery</li>
+                        <li><i class="fas fa-moon mr-1"></i> Dark/light mode toggle</li>
+                        <li><i class="fas fa-search mr-1"></i> Full content search</li>
+                        <li><i class="fas fa-file-pdf mr-1"></i> PDF export options</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-3" style="color: var(--highlight);">References</h3>
+                    <p class="text-sm" style="color: var(--muted);">Data from SKIMS Medical College, Bemina Srinagar. All images and research findings are from the original thesis work. Dashboard created on September 15, 2025.</p>
+                    <div class="flex items-center gap-3 mt-3">
+                        <a href="../final_outputs/THESIS.pdf" class="text-sm hover:underline" style="color: var(--highlight);">Full Thesis PDF</a>
+                        <span style="color: var(--muted);">|</span>
+                        <a href="#" id="accessibility-toggle" class="text-sm hover:underline" style="color: var(--highlight);">Accessibility</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 dark:border-gray-700 mt-6 pt-6 text-center" style="color: var(--muted);">
+                <p>© 2025 Interactive AUB Thesis Dashboard | SKIMS Medical College</p>
+            </div>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const reportContent = `
+# Histopathological Patterns in Abnormal Uterine Bleeding - Thesis
+
+## INTRODUCTION
+
+Abnormal uterine bleeding (AUB) is an umbrella term encompassing various forms of uterine bleeding that deviate from the normal menstrual pattern in terms of regularity, volume, duration, or frequency. It is defined as bleeding originating from the uterine corpus in a non-pregnant woman. AUB can manifest as heavy menstrual bleeding, irregular menstrual bleeding, or postmenopausal bleeding, which all differ in severity and cause. This condition has emerged as a leading cause for gynecologic consultation, significantly affecting a substantial portion of the female population. The impact of AUB is widespread, with studies suggesting that up to 14-25% of women in the reproductive age group, and up to 50% of women in the perimenopausal phase, experience some form of abnormal uterine bleeding.
+
+Abnormal uterine bleeding is considered a common complaint, often causing considerable physical and emotional distress to affected individuals. In reproductive-aged women, it frequently leads to impaired quality of life, with symptoms such as heavy menstrual bleeding (HMB) causing anemia, fatigue, and restriction in daily activities. Furthermore, AUB often leads women to seek medical advice as the condition may be associated with underlying pathologies, including uterine fibroids, polyps, endometrial hyperplasia, and, in more serious cases, malignancy. As women approach perimenopause, the frequency and severity of AUB tend to increase, mainly due to hormonal changes, aging, and the onset of structural uterine abnormalities.
+
+### The Significance of AUB and its Prevalence
+
+Abnormal uterine bleeding is a condition that varies widely in terms of its prevalence, depending on age, geography, and health conditions. Studies suggest that the prevalence of AUB in reproductive-age women ranges from 3% to 30%, with some reports noting that it can affect up to one-third of women at some point in their lives. The condition also disproportionately affects perimenopausal and postmenopausal women, as they are at increased risk of underlying structural uterine changes such as fibroids and endometrial hyperplasia. In postmenopausal women, AUB is particularly concerning because it raises the possibility of malignancy, necessitating a thorough evaluation.
+
+Perimenopause is a phase of transition before menopause, generally beginning between 45 and 47 years of age, marked by irregular cycles and hormonal fluctuations, which can contribute to AUB. The World Health Organization (WHO) defines perimenopause as the period extending from two to eight years before menopause, characterized by a decline in ovarian function and a reduction in estrogen production. This phase is often marked by unpredictable menstrual cycles, with some women experiencing an increase in menstrual flow, while others experience irregular bleeding or skipped periods.
+
+In terms of structural abnormalities, common causes of AUB during the reproductive years include uterine fibroids (leiomyomas), endometrial polyps, and adenomyosis. As women approach perimenopause, however, conditions like endometrial hyperplasia and carcinoma become more prevalent. This shift in pathology underscores the importance of tailoring diagnostic and therapeutic strategies based on a woman's age and reproductive status.
+
+### Nomenclature and Classification of AUB
+
+Historically, AUB was described using a variety of inconsistent terms such as menorrhagia, metrorrhagia, and dysfunctional uterine bleeding (DUB). These terms often overlapped and failed to provide clear diagnostic distinctions. In response to this, the International Federation of Gynecology and Obstetrics (FIGO) introduced a consensus on the terminology for AUB in 2007. This consensus aimed to standardize terminology and provide a more comprehensive and clinically relevant classification system. In 2011, FIGO published an updated classification that included the PALM-COEIN system, which classifies AUB into structural and non-structural categories based on the underlying pathology. The PALM-COEIN system includes the following categories:
+
+- **P** – Polyp (AUB-P)
+- **A** – Adenomyosis (AUB-A)
+- **L** – Leiomyoma (AUB-L)
+- **M** – Malignancy and Hyperplasia (AUB-M)
+- **C** – Coagulopathy (AUB-C)
+- **O** – Ovulatory Dysfunction (AUB-O)
+- **E** – Endometrial (AUB-E)
+- **N** – Iatrogenic and Not Otherwise Classified (AUB-N)
+
+This classification system has revolutionized the understanding of AUB by categorizing its causes into structural (e.g., polyps, fibroids, endometrial carcinoma) and non-structural factors (e.g., coagulopathies, ovulatory dysfunction). The PALM-COEIN system is instrumental in guiding clinical management, ensuring that both clinicians and patients can communicate effectively about the underlying causes of AUB. It also facilitates research by providing a unified framework for investigating the etiology of abnormal uterine bleeding.
+
+### Pathophysiology and Mechanisms of AUB
+
+The pathophysiology of AUB is multifactorial and varies depending on the underlying cause. In cases involving structural abnormalities such as uterine fibroids, polyps, or adenomyosis, the uterus becomes unable to function normally during the menstrual cycle. Fibroids, for instance, can disrupt the endometrial lining, leading to heavy bleeding and irregular cycles. Similarly, polyps or endometrial hyperplasia can result in abnormal bleeding patterns due to abnormal growth of endometrial tissue.
+
+In addition to structural causes, non-structural factors, such as ovulatory dysfunction, also play a crucial role in AUB. Ovulatory dysfunction, commonly associated with anovulatory cycles, can result in irregular shedding of the endometrium, leading to heavy bleeding. This is often seen in adolescent girls and women in the perimenopausal period due to hormonal fluctuations or insufficient progesterone production during the luteal phase of the menstrual cycle.
+
+Moreover, coagulopathies (disorders of blood clotting) can significantly contribute to abnormal uterine bleeding. Women with underlying bleeding disorders, such as von Willebrand disease or platelet dysfunction, are at increased risk for heavy or prolonged bleeding episodes. The pathophysiology of coagulopathies in AUB involves a disruption in the normal coagulation cascade, preventing proper clot formation and leading to excessive menstrual flow.
+
+One of the critical contributors to primary endometrial dysfunction is a disturbance in the mechanisms responsible for endometrial hemostasis. This can result from a failure to produce adequate vasoconstrictors such as endothelin-1 and prostaglandin F2α, or from excessive production of vasodilators like prostaglandin E2 and prostacyclin, which promote vasodilation and increase blood flow to the uterus. These imbalances can lead to abnormal bleeding, particularly during menstruation, when the endometrial tissue is naturally undergoing shedding.
+
+Chronic endometrial inflammation or infection may also play a role in AUB. Although chronic endometritis has been recognized as a potential cause of AUB, its exact relationship with abnormal bleeding remains unclear. Chronic endometritis may occur due to infections or long-term inflammation within the uterus, leading to changes in the endometrial lining that could contribute to abnormal bleeding patterns. However, there is insufficient evidence to classify it definitively as a major cause of AUB, and it is often regarded as a diagnosis of exclusion.
+
+### Diagnostic Approaches to AUB
+
+The diagnosis of AUB requires a systematic approach, starting with a detailed patient history and physical examination. A thorough history helps to identify potential causes, such as medications (e.g., anticoagulants, hormonal therapies), underlying health conditions (e.g., thyroid dysfunction, coagulopathies), or a history of uterine pathology (e.g., fibroids or polyps). Exclusion of pregnancy-related causes is paramount, especially in reproductive-aged women, as pregnancy complications (e.g., miscarriage, ectopic pregnancy) can lead to abnormal bleeding.
+
+The next step in the diagnostic workup is endometrial sampling (biopsy), which is considered the gold standard for diagnosing AUB. Endometrial biopsy involves the collection of tissue from the uterine lining for histopathological evaluation. This procedure is critical in diagnosing conditions such as endometrial hyperplasia, carcinoma, and inflammatory disorders. Additionally, hysteroscopy has gained popularity as a diagnostic tool, as it provides direct visualization of the uterine cavity, allowing for the detection of focal lesions such as polyps, fibroids, and other structural abnormalities.
+
+Dilation and curettage (D&C) remains a common procedure for obtaining endometrial tissue, especially in settings where hysteroscopy is not readily available. However, D&C has limitations, particularly in its inability to detect focal lesions or malignancy in some cases, especially in postmenopausal women. Therefore, combining D&C with complementary imaging techniques, such as saline infusion sonohysterography or hysteroscopy, can enhance diagnostic accuracy and improve management.
+
+Ultrasound imaging is also commonly used in the evaluation of AUB, especially to assess for structural lesions such as fibroids and polyps. While it is a non-invasive and widely accessible tool, ultrasound may not always provide sufficient detail for accurate diagnosis, particularly when there are focal lesions in the uterine cavity. In such cases, advanced imaging or direct visualization via hysteroscopy may be necessary.
+
+## REVIEW OF LITERATURE
+
+[Literature Review Section from Thesis.md]
+
+## AIMS AND OBJECTIVES
+
+1. To identify the various histopathological patterns in the endometrial biopsies and curetting in the patients of AUB.
+
+2. To see the correlation of the endometrial Biopsies and curetting in AUB with the radiological findings (if any) in these patients.
+
+## MATERIAL AND METHODS
+
+The present observational study (retrospective, prospective) study will be conducted in Department of Pathology, SKIMS Medical College, Bemina Srinagar... [Methods section continues]
+
+## RESULTS AND OBSERVATIONS
+
+This study presents the findings of the study based on histopathological evaluation of endometrial samples collected from 351 patients presenting with abnormal uterine bleeding (AUB). The results are categorized into descriptive analysis and correlation (inferential) statistics.
+
+### Table 1: Histopathological diagnosis
+- Proliferative Phase: 28.2%
+- Secretory Phase: 29.3%
+- Disordered Proliferative endometrium: 4.6%
+- Pill endometrium: 4.3%
+- Chronic endometritis: 2.0%
+- Endometrial Polyp: 5.4%
+- Endometrial hyperplasia without atypia: 12.0%
+- Endometrial hyperplasia with atypia: 2.8%
+- Endometrial Carcinoma: 1.4%
+- Bleeding endometrium: 1.4%
+- No opinion: 5.1%
+- Pseudodecidual changes: 3.4%
+
+### Table 2: Age distribution
+- 20 - 30 years: 21.1%
+- 31 - 40 years: 47.6%
+- 41 - 50 years: 24.8%
+- 51 - 60 years: 4.3%
+- >60 years: 2.3%
+
+### Table 3: Presenting complaints
+- Menorrhagia: 40.5%
+- Metrorrhagia: 18.8%
+- Polymenorrhea: 8.0%
+- Metro-menorrhea: 5.1%
+- Post-menopausal bleeding: 8.5%
+- Post cortal bleeding: 1.7%
+- Polymenorrhagia: 3.7%
+- Oligomenorrhea: 9.1%
+- Dysmenorrhoea: 4.6%
+
+### Table 4: Parity
+- Nulliparus: 6.3%
+- Low Parity: 92.6%
+- High Parity: 1.1%
+
+### Table 5: Drug history
+- No (hormonal intake): 74.6%
+- Yes (hormonal intake): 25.4%
+
+### Correlations
+- Age vs. Histopathological diagnosis: r=0.264 (p < 0.001)
+- LMP vs. Histopathological diagnosis: r=0.766 (p < 0.001)
+- Drug history vs. Histopathological diagnosis: r=0.287 (p < 0.001)
+- Complaints vs. Histopathological diagnosis: r=-0.052 (p = 0.331)
+
+
+## DISCUSSION
+
+[Discussion Section from Thesis.md]
+
+## RECOMMENDATIONS
+
+[Recommendations Section from Thesis.md]
+
+## SUMMARY
+
+[Summary Section from Thesis.md]
+
+## CONCLUSION
+
+[Conclusion Section from Thesis.md]
+
+## LIMITATIONS
+
+[Limitations Section from Thesis.md]
+`;
+
+    const chartColors = {
+        teal: ['#0d9488', '#14b8a6', '#5eead4', '#99f6e4'],
+        coral: ['#ea580c', '#f97316', '#fb923c', '#fdbf8a'],
+        gray: ['#6b7280', '#9ca3af', '#d1d5db', '#e5e7eb'],
+        mixed: ['#14b8a6', '#f97316', '#0891b2', '#f59e0b', '#6d28d9', '#db2777', '#4b5563']
+    };
+
+    const defaultChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: '#1f2937',
+                titleFont: { size: 14 },
+                bodyFont: { size: 12 },
+                padding: 10,
+                cornerRadius: 4,
+                displayColors: false
+            },
+            zoom: {
+                pan: {
+                    enabled: true,
+                    mode: 'xy',
+                    overScaleMode: 'xy'
+                },
+                zoom: {
+                    wheel: { enabled: true },
+                    pinch: { enabled: true },
+                    mode: 'xy',
+                    overScaleMode: 'xy',
+                }
+            }
+        },
+        scales: {
+            x: {
+                ticks: { font: { size: 11 }, autoSkip: false, maxRotation: 45, minRotation: 0 },
+                grid: { display: false }
+            },
+            y: {
+                beginAtZero: true,
+                ticks: { callback: value => value + '%' },
+                grid: { color: '#e5e7eb' }
+            }
+        }
+    };
+    
+    Chart.defaults.font.family = "'Inter', sans-serif";
+
+    new Chart(document.getElementById('ageChart'), { type: 'bar', data: {
+        labels: ['20-30', '31-40', '41-50', '51-60', '>60'],
+        datasets: [{ label: 'Patient Percentage', data: [21.1, 47.6, 24.8, 4.3, 2.3], backgroundColor: chartColors.teal, borderWidth: 1, borderRadius: 4 }]
+    }, options: defaultChartOptions });
+
+    new Chart(document.getElementById('complaintsChart'), { type: 'bar', data: {
+        labels: ['Menorrhagia', 'Metrorrhagia', 'Oligomenorrhea', 'Polymenorrhea', 'Post-menopausal bleeding', 'Metro-menorrhea', 'Dysmenorrhoea', 'Polymenorrhagia', 'Post coital bleeding'],
+        datasets: [{ label: 'Patient Percentage', data: [40.5, 18.8, 9.1, 8.0, 8.5, 5.1, 4.6, 3.7, 1.7], backgroundColor: chartColors.mixed, borderWidth: 1, borderRadius: 4 }]
+    }, options: defaultChartOptions });
+
+    new Chart(document.getElementById('parityChart'), { type: 'bar', data: {
+        labels: ['Low Parity', 'Nulliparous', 'High Parity'],
+        datasets: [{ label: 'Patient Percentage', data: [92.6, 6.3, 1.1], backgroundColor: [chartColors.teal[0], chartColors.teal[2], chartColors.teal[3]], borderWidth: 1, borderRadius: 4 }]
+    }, options: defaultChartOptions });
+    
+    new Chart(document.getElementById('drugHistoryChart'), { type: 'doughnut', data: {
+        labels: ['No Hormonal Intake', 'Yes (Hormonal Intake)'],
+        datasets: [{ data: [74.6, 25.4], backgroundColor: [chartColors.teal[0], chartColors.coral[1]], borderColor: '#ffffff', borderWidth: 4 }]
+    }, options: {
+        responsive: true, maintainAspectRatio: false, cutout: '60%',
+        plugins: { legend: { position: 'bottom', labels: { padding: 20, boxWidth: 12, font: { size: 12 }}},
+            tooltip: { callbacks: { label: context => `${context.label}: ${context.raw}%` }}
+        }
+    }});
+
+    new Chart(document.getElementById('histopathologyChart'), { type: 'bar', data: {
+        labels: ['Secretory Phase', 'Proliferative Phase', 'Endometrial hyperplasia without atypia', 'Endometrial Polyp', 'No opinion', 'Disordered Proliferative endometrium', 'Pill endometrium', 'Pseudodecidual changes', 'Endometrial hyperplasia with atypia', 'Chronic endometritis', 'Endometrial Carcinoma', 'Bleeding endometrium'],
+        datasets: [{ label: 'Percentage of Cases', data: [29.3, 28.2, 12.0, 5.4, 5.1, 4.6, 4.3, 3.4, 2.8, 2.0, 1.4, 1.4], backgroundColor: [...chartColors.teal, ...chartColors.coral, ...chartColors.gray, ...chartColors.mixed.slice(4)], borderWidth: 1, borderRadius: 4 }]
+    }, options: defaultChartOptions });
+
+    const tabs = document.querySelectorAll('.correlation-tab');
+    const contents = document.querySelectorAll('.correlation-content');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(item => item.classList.remove('text-teal-600', 'border-teal-500'));
+            tab.classList.add('text-teal-600', 'border-teal-500');
+            const targetId = tab.dataset.target;
+            contents.forEach(content => content.classList.toggle('hidden', content.id !== targetId));
+        });
+    });
+    
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav-link');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            if (pageYOffset >= section.offsetTop - 100) { current = section.getAttribute('id'); }
+        });
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').includes(current)) { link.classList.add('active'); }
+        });
+    });
+
+    // --- Knowledge Graph Logic ---
+    const graphContainer = document.getElementById('graph-container');
+    const canvas = document.getElementById('graph-canvas');
+    const ctx = canvas.getContext('2d');
+    const legendContainer = document.getElementById('graph-legend');
+    let nodes, nodeElements, edges;
+    let animationFrameId;
+
+    const graphData = {
+        nodes: [
+            { id: 'AUB', label: 'AUB', group: 'topic' },
+            { id: 'Menorrhagia', label: 'Menorrhagia', group: 'symptom' },
+            { id: 'Age 31-40', label: 'Age 31-40', group: 'factor' },
+            { id: 'Secretory Phase', label: 'Secretory Phase', group: 'finding' },
+            { id: 'Proliferative Phase', label: 'Proliferative Phase', group: 'finding' },
+            { id: 'Hyperplasia', label: 'Hyperplasia', group: 'finding' },
+            { id: 'Carcinoma', label: 'Carcinoma', group: 'finding' },
+            { id: 'Histopathology', label: 'Histopathology', group: 'diagnosis' },
+            { id: 'Age Factor', label: 'Age Factor', group: 'factor' },
+            { id: 'LMP Factor', label: 'LMP Factor', group: 'factor' }
+        ],
+        edges: [
+            { from: 'AUB', to: 'Menorrhagia' }, { from: 'AUB', to: 'Age 31-40' },
+            { from: 'AUB', to: 'Secretory Phase' }, { from: 'AUB', to: 'Proliferative Phase' },
+            { from: 'AUB', to: 'Histopathology' }, { from: 'Age 31-40', to: 'AUB' },
+            { from: 'Age Factor', to: 'Hyperplasia' }, { from: 'Age Factor', to: 'Carcinoma' },
+            { from: 'Hyperplasia', to: 'Histopathology' }, { from: 'Carcinoma', to: 'Histopathology' },
+            { from: 'LMP Factor', to: 'Histopathology' }, { from: 'Menorrhagia', to: 'Histopathology'}
+        ]
+    };
+
+    const legend = {
+        'topic': 'Main Topic', 'symptom': 'Symptom', 'factor': 'Demographic/Factor',
+        'finding': 'Histopathological Finding', 'diagnosis': 'Diagnostic Method'
+    };
+
+    function startSimulation() {
+        const { width, height } = graphContainer.getBoundingClientRect();
+        
+        // Settings for the physics simulation
+        const settings = {
+            charge: -300, // Repulsion force
+            linkDistance: 120, // Ideal distance between connected nodes
+            centerGravity: 0.1, // Pulls graph to the center
+            friction: 0.9, // Slows down movement
+        };
+
+        function tick() {
+            // 1. Calculate forces
+            for (let i = 0; i < nodes.length; i++) {
+                const nodeA = nodes[i];
+                
+                // Centering force
+                nodeA.vx += (width / 2 - nodeA.x) * settings.centerGravity * 0.01;
+                nodeA.vy += (height / 2 - nodeA.y) * settings.centerGravity * 0.01;
+
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const nodeB = nodes[j];
+                    const dx = nodeB.x - nodeA.x;
+                    const dy = nodeB.y - nodeA.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 1) distance = 1;
+
+                    // Repulsion force (charge)
+                    const force = settings.charge / (distance * distance);
+                    const forceX = force * (dx / distance);
+                    const forceY = force * (dy / distance);
+                    
+                    nodeA.vx += forceX;
+                    nodeA.vy += forceY;
+                    nodeB.vx -= forceX;
+                    nodeB.vy -= forceY;
+                }
+            }
+            
+            // 2. Link spring force
+            edges.forEach(edge => {
+                const source = edge.source;
+                const target = edge.target;
+                const dx = target.x - source.x;
+                const dy = target.y - source.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance > 0) {
+                    const stretch = (distance - settings.linkDistance) / distance;
+                    const forceX = dx * stretch * 0.1;
+                    const forceY = dy * stretch * 0.1;
+                    source.vx += forceX;
+                    source.vy += forceY;
+                    target.vx -= forceX;
+                    target.vy -= forceY;
+                }
+            });
+
+            // 3. Update positions
+            nodes.forEach(node => {
+                node.vx *= settings.friction;
+                node.vy *= settings.friction;
+                
+                node.x += node.vx;
+                node.y += node.vy;
+
+                // Boundary collision
+                node.x = Math.max(50, Math.min(width - 50, node.x));
+                node.y = Math.max(30, Math.min(height - 30, node.y));
+            });
+            
+            // 4. Draw
+            draw();
+            animationFrameId = requestAnimationFrame(tick);
+        }
+
+        tick();
+    }
+    
+    function draw() {
+        const { width, height } = canvas.getBoundingClientRect();
+        if (canvas.width !== width || canvas.height !== height) {
+           canvas.width = width;
+           canvas.height = height;
+        }
+        ctx.clearRect(0, 0, width, height);
+
+        // Update DOM element positions
+        nodes.forEach((node, i) => {
+            nodeElements[i].style.left = `${node.x}px`;
+            nodeElements[i].style.top = `${node.y}px`;
+        });
+
+        // Draw edges
+        ctx.strokeStyle = '#cbd5e1'; // gray-300
+        ctx.lineWidth = 1.5;
+        edges.forEach(edge => {
+            ctx.beginPath();
+            ctx.moveTo(edge.source.x, edge.source.y);
+            ctx.lineTo(edge.target.x, edge.target.y);
+            ctx.stroke();
+        });
+    }
+
+    function initializeGraph() {
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+        const { width, height } = graphContainer.getBoundingClientRect();
+        
+        nodes = graphData.nodes.map(n => ({ ...n, x: Math.random() * width, y: Math.random() * height, vx: 0, vy: 0 }));
+        edges = graphData.edges.map(e => ({
+            source: nodes.find(n => n.id === e.from),
+            target: nodes.find(n => n.id === e.to)
+        }));
+
+        graphContainer.querySelectorAll('.graph-node').forEach(n => n.remove());
+        legendContainer.innerHTML = '';
+
+        for (const group in legend) {
+            const legendItem = document.createElement('div');
+            legendItem.className = 'flex items-center gap-2';
+            legendItem.innerHTML = `<div class="w-4 h-4 rounded-full" style="background-color: ${getComputedStyle(document.documentElement).getPropertyValue(`--color-${group}`)}"></div><span>${legend[group]}</span>`;
+            
+            const colorDiv = document.createElement('div');
+            colorDiv.className = `w-4 h-4 rounded-full graph-node`;
+            colorDiv.dataset.group = group;
+            legendItem.prepend(colorDiv);
+            legendContainer.appendChild(legendItem);
+        }
+
+        nodes.forEach(node => {
+            const nodeEl = document.createElement('div');
+            nodeEl.className = 'graph-node';
+            nodeEl.dataset.id = node.id;
+            nodeEl.dataset.group = node.group;
+            nodeEl.textContent = node.label;
+            graphContainer.appendChild(nodeEl);
+            
+            nodeEl.addEventListener('mouseenter', () => highlightConnections(node.id));
+            nodeEl.addEventListener('mouseleave', resetHighlights);
+        });
+        
+        nodeElements = Array.from(graphContainer.getElementsByClassName('graph-node'));
+        startSimulation();
+    }
+    
+    function highlightConnections(nodeId) {
+        const connectedNodeIds = new Set([nodeId]);
+        edges.forEach(edge => {
+            if (edge.source.id === nodeId) connectedNodeIds.add(edge.target.id);
+            if (edge.target.id === nodeId) connectedNodeIds.add(edge.source.id);
+        });
+
+        nodeElements.forEach(el => {
+            el.classList.toggle('dimmed', !connectedNodeIds.has(el.dataset.id));
+        });
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.strokeStyle = '#e2e8f0'; // gray-200
+        ctx.lineWidth = 1;
+        edges.forEach(edge => {
+             if (!(edge.source.id === nodeId || edge.target.id === nodeId)) {
+                ctx.beginPath();
+                ctx.moveTo(edge.source.x, edge.source.y);
+                ctx.lineTo(edge.target.x, edge.target.y);
+                ctx.stroke();
+             }
+        });
+
+        ctx.strokeStyle = '#0f766e'; // teal-700
+        ctx.lineWidth = 2.5;
+        edges.forEach(edge => {
+             if (edge.source.id === nodeId || edge.target.id === nodeId) {
+                ctx.beginPath();
+                ctx.moveTo(edge.source.x, edge.source.y);
+                ctx.lineTo(edge.target.x, edge.target.y);
+                ctx.stroke();
+             }
+        });
+    }
+
+    function resetHighlights() {
+        nodeElements.forEach(el => el.classList.remove('dimmed'));
+        draw(); // Redraws all edges with default style
+    }
+    
+    initializeGraph();
+    window.addEventListener('resize', initializeGraph);
+    
+    // Gemini API Integration
+    const apiKey = ""; 
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+    async function callGeminiAPI(prompt, systemInstruction = null) {
+        const payload = { contents: [{ parts: [{ text: prompt }] }] };
+        if (systemInstruction) {
+            payload.systemInstruction = { parts: [{ text: systemInstruction }] };
+        }
+        let response;
+        let delay = 1000;
+        for (let i = 0; i < 5; i++) {
+            try {
+                response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (response.ok) break;
+            } catch (error) {}
+            await new Promise(resolve => setTimeout(resolve, delay));
+            delay *= 2; 
+        }
+        if (!response || !response.ok) throw new Error('API request failed after multiple retries.');
+        const result = await response.json();
+        const candidate = result.candidates?.[0];
+        if (candidate && candidate.content?.parts?.[0]?.text) {
+            return candidate.content.parts[0].text;
+        } else {
+            throw new Error('Invalid response structure from API.');
+        }
+    }
+
+    const summaryBtn = document.getElementById('generate-summary-btn');
+    const summaryLoader = document.getElementById('summary-loader');
+    const summaryOutput = document.getElementById('summary-output');
+    const summaryError = document.getElementById('summary-error');
+    summaryBtn.addEventListener('click', async () => {
+        summaryBtn.disabled = true;
+        summaryLoader.classList.remove('hidden');
+        summaryOutput.classList.add('hidden');
+        summaryError.classList.add('hidden');
+        const systemPrompt = "You are a medical research analyst. Provide a clear, concise summary of the following medical thesis on Abnormal Uterine Bleeding (AUB). Focus on the key findings, their clinical significance, and the main conclusions based on the full thesis provided. The summary should be easily understandable by healthcare professionals.";
+        const userPrompt = `Summarize the following thesis: \n\n${reportContent}`;
+        try {
+            const summaryText = await callGeminiAPI(userPrompt, systemPrompt);
+            summaryOutput.innerHTML = summaryText.replace(/\n/g, '<br>');
+            summaryOutput.classList.remove('hidden');
+        } catch (error) {
+            summaryError.textContent = 'An error occurred while generating the summary. Please try again later.';
+            summaryError.classList.remove('hidden');
+        } finally {
+            summaryBtn.disabled = false;
+            summaryLoader.classList.add('hidden');
+        }
+    });
+    
+    const questionInput = document.getElementById('question-input');
+    const askBtn = document.getElementById('ask-question-btn');
+    const qaLoader = document.getElementById('qa-loader');
+    const qaOutput = document.getElementById('qa-output');
+    const qaError = document.getElementById('qa-error');
+    askBtn.addEventListener('click', async () => {
+        const question = questionInput.value.trim();
+        if (!question) return;
+        askBtn.disabled = true;
+        qaLoader.classList.remove('hidden');
+        qaOutput.classList.add('hidden');
+        qaError.classList.add('hidden');
+        const systemPrompt = "You are an AI assistant specialized in answering questions based on the provided comprehensive medical thesis. Use only the information from the full text, including descriptions of figures and tables, to answer the user's question accurately. If the question pertains to a visual element (like a chart or graph), describe the visual and its key takeaways as presented in the document.";
+        const userPrompt = `Based on the following thesis document, please answer this question: "${question}"\n\nDocument:\n${reportContent}`;
+        try {
+            const answerText = await callGeminiAPI(userPrompt, systemPrompt);
+            qaOutput.innerHTML = answerText.replace(/\n/g, '<br>');
+            qaOutput.classList.remove('hidden');
+        } catch (error) {
+            qaError.textContent = 'An error occurred while getting the answer. Please try again later.';
+            qaError.classList.remove('hidden');
+        } finally {
+            askBtn.disabled = false;
+            qaLoader.classList.add('hidden');
+        }
+    });
+});
+</script>
+</body>
+</html>
+

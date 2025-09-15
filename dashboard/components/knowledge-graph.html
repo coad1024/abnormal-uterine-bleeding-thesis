@@ -1,0 +1,13 @@
+<section id="knowledge-graph" class="mb-16 scroll-mt-20">
+    <h2 class="text-3xl font-bold text-center mb-2" style="color: var(--highlight);">Knowledge Graph: AUB Relationships</h2>
+    <p class="text-center max-w-3xl mx-auto mb-10" style="color: var(--muted);">This interactive graph visualizes the key concepts from the thesis and their relationships. Hover over a node to highlight its direct connections and better understand the complex interplay of factors in Abnormal Uterine Bleeding.</p>
+    <div class="card p-6 rounded-lg shadow">
+        <div id="graph-legend" class="flex justify-center flex-wrap gap-x-6 gap-y-2 mb-4 text-sm"></div>
+        <div id="graph-container" class="relative w-full h-[600px] border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <canvas id="graph-canvas" class="absolute top-0 left-0 w-full h-full"></canvas>
+        </div>
+        <div class="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <p class="text-sm" style="color: var(--muted);"><i class="fas fa-info-circle mr-1"></i> <strong>How to use:</strong> Hover over any node to see its connections. The thickness of the lines indicates the strength of the relationship. Nodes are color-coded by category.</p>
+        </div>
+    </div>
+</section>

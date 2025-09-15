@@ -1,0 +1,38 @@
+<section id="ask" class="mb-16 scroll-mt-20">
+    <h2 class="text-3xl font-bold text-center mb-2" style="color: var(--highlight);">✨ Ask the Thesis</h2>
+    <p class="text-center max-w-3xl mx-auto mb-6" style="color: var(--muted);">Ask a question about methodology, literature review, statistics, or findings. The system retrieves the most relevant passages from the thesis and composes a concise answer with inline citations.</p>
+    <div class="text-center text-xs mb-6" style="color: var(--muted);">
+        <span class="px-2 py-1 rounded border border-dashed" style="border-color: var(--muted);">Local retrieval only – no external API calls</span>
+    </div>
+    <div class="card p-8 rounded-lg shadow max-w-4xl mx-auto">
+        <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-grow relative">
+                <input type="text" id="question-input" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-teal-500 focus:outline-none dark:bg-gray-700" placeholder="e.g., What were the exclusion criteria for the study?">
+                <div class="absolute right-3 top-3 text-gray-400">
+                    <i class="fas fa-microphone cursor-pointer" id="voice-input" title="Speak your question"></i>
+                </div>
+            </div>
+            <button id="ask-question-btn" style="background-color: var(--highlight);" class="text-white font-semibold py-3 px-6 rounded-lg hover:opacity-90 transition shadow-md">Submit Question</button>
+        </div>
+        <div class="mt-4">
+            <div class="flex gap-2 flex-wrap">
+                <span class="text-sm font-medium" style="color: var(--muted);">Sample questions:</span>
+                <button class="sample-question text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition">What were the exclusion criteria?</button>
+                <button class="sample-question text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition">How was data collected?</button>
+                <button class="sample-question text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition">What statistical methods were used?</button>
+                <button class="sample-question text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition">Summarize the main findings.</button>
+            </div>
+        </div>
+        <div id="qa-loader" class="hidden flex justify-center mt-6"><div class="loader"></div></div>
+        <div id="qa-output" class="mt-6 bg-gray-100 dark:bg-gray-800 p-6 rounded-lg hidden">
+            <div id="qa-answer" class="prose dark:prose-invert max-w-none text-sm leading-relaxed"></div>
+            <div id="qa-citations" class="mt-4 text-xs text-gray-500 dark:text-gray-400 hidden"></div>
+        </div>
+        <div id="qa-error" class="mt-6 bg-red-100 dark:bg-red-900/30 p-6 rounded-lg text-red-700 dark:text-red-300 hidden"></div>
+        <div id="qa-sources" class="mt-8 hidden">
+            <h4 class="font-semibold mb-2 text-sm tracking-wide" style="color: var(--highlight);">Top Source Passages</h4>
+            <ol id="qa-source-list" class="space-y-3 text-xs list-decimal pl-5"></ol>
+        </div>
+        <div id="qa-debug" class="mt-6 hidden text-[10px] font-mono whitespace-pre-wrap bg-gray-50 dark:bg-gray-900/40 p-3 rounded border border-dashed border-gray-300 dark:border-gray-700"></div>
+    </div>
+</section>

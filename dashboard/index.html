@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Dashboard: Histopathological Patterns in Abnormal Uterine Bleeding (AUB)</title>
+    <meta name="description" content="An interactive dashboard showcasing histopathological patterns in abnormal uterine bleeding based on thesis research">
+    <meta name="theme-color" content="#ffffff">
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.7/build/pdfmake.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.7/build/vfs_fonts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Internal Stylesheets -->
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/graph.css">
+    <link rel="stylesheet" href="./css/advanced-visualizations.css">
+    <link rel="stylesheet" href="./css/gallery.css">
+    <link rel="stylesheet" href="./css/discussion.css">
+</head>
+<body>
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Header will be loaded here -->
+    <div id="header-container"></div>
+
+    <!-- Main content -->
+    <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12" role="main">
+        <!-- Loading indicator -->
+        <div id="loading-spinner" class="flex justify-center items-center py-20">
+            <div class="loader"></div>
+            <span class="ml-4">Loading dashboard components...</span>
+        </div>
+        
+        <!-- Component containers -->
+        <div id="overview-container"></div>
+        <div id="demographics-container"></div>
+        <div id="findings-container"></div>
+        <div id="correlations-container"></div>
+        <div id="advanced-visualizations-container"></div>
+        <div id="gallery-container"></div>
+        <div id="discussion-container"></div>
+        <div id="ask-container"></div>
+        <div id="conclusion-container"></div>
+    </main>
+
+    <!-- Image modal for gallery -->
+    <div id="image-modal" class="hidden fixed inset-0 z-50 p-4 flex items-center justify-center modal-overlay">
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-xl max-w-5xl w-full max-h-screen overflow-hidden relative">
+            <div class="absolute top-2 right-2 flex space-x-2">
+                <button id="zoom-in" class="p-2 rounded-full bg-gray-100 dark:bg-gray-700" aria-label="Zoom in">
+                    <i class="fas fa-search-plus"></i>
+                </button>
+                <button id="zoom-out" class="p-2 rounded-full bg-gray-100 dark:bg-gray-700" aria-label="Zoom out">
+                    <i class="fas fa-search-minus"></i>
+                </button>
+                <button id="reset-zoom" class="p-2 rounded-full bg-gray-100 dark:bg-gray-700" aria-label="Reset zoom">
+                    <i class="fas fa-undo-alt"></i>
+                </button>
+                <button id="close-modal" class="p-2 rounded-full bg-gray-100 dark:bg-gray-700" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="h-[calc(100vh-8rem)] flex items-center justify-center overflow-auto">
+                <img id="modal-image" src="" alt="" class="max-w-full h-auto max-h-full object-contain mx-auto" style="transform-origin: center; transform: scale(1);">
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script src="./js/main.js"></script>
+    <script src="./js/theme.js"></script>
+    <script src="./js/charts.js"></script>
+    <script src="./js/gallery.js"></script>
+    <script src="./js/search.js"></script>
+    <script src="./js/pdf-export.js"></script>
+    <script src="./js/correlations.js"></script>
+    <script src="./js/direct-tab-functionality.js"></script>
+    <script src="./js/path-correction.js"></script>
+    <script src="./js/advanced-visualizations.js"></script>
+    <script src="./js/visualization-fallback.js"></script>
+    <script src="./js/ask-thesis.js"></script>
+</body>
+</html>

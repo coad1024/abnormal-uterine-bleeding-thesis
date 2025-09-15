@@ -1,0 +1,56 @@
+<header class="shadow-sm sticky top-0 z-50" style="background-color: var(--card-bg);" role="banner">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" role="navigation" aria-label="Main navigation">
+        <div class="flex justify-between items-center py-4">
+            <div class="text-xl font-bold" style="color: var(--highlight);">AUB Thesis Dashboard</div>
+            <div class="hidden md:flex flex-wrap items-center gap-x-6 gap-y-2" role="menubar">
+                <a href="#overview" class="nav-link hover:text-teal-600 transition" role="menuitem">Overview</a>
+                <a href="#demographics" class="nav-link hover:text-teal-600 transition" role="menuitem">Demographics</a>
+                <a href="#findings" class="nav-link hover:text-teal-600 transition" role="menuitem">Findings</a>
+                <a href="#correlations" class="nav-link hover:text-teal-600 transition" role="menuitem">Correlations</a>
+                <a href="#advanced-visualizations" class="nav-link hover:text-teal-600 transition" role="menuitem">Advanced Charts</a>
+                <a href="#discussion" class="nav-link hover:text-teal-600 transition" role="menuitem">Discussion</a>
+                <a href="#ask" class="nav-link hover:text-teal-600 transition" role="menuitem">✨ Ask the Thesis</a>
+                <a href="#conclusion" class="nav-link hover:text-teal-600 transition" role="menuitem">Conclusion</a>
+                <button id="theme-toggle" class="ml-4 p-2 rounded-full" aria-label="Toggle dark/light mode" role="button" tabindex="0">
+                    <i class="fas fa-moon dark:hidden" aria-hidden="true"></i>
+                    <i class="fas fa-sun hidden dark:inline" aria-hidden="true"></i>
+                </button>
+                <button id="pdf-export" class="ml-2 p-2 rounded-full" aria-label="Export to PDF" role="button" tabindex="0">
+                    <i class="fas fa-file-pdf" aria-hidden="true"></i>
+                </button>
+                <button id="search-toggle" class="ml-2 p-2 rounded-full" aria-label="Search content" role="button" tabindex="0">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                </button>
+            </div>
+            <button id="mobile-menu-toggle" class="md:hidden p-2" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobile-menu" role="button" tabindex="0">
+                <i class="fas fa-bars" aria-hidden="true"></i>
+            </button>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden py-2 space-y-2" role="menu" aria-labelledby="mobile-menu-toggle">
+            <a href="#overview" class="block nav-link px-4 py-2" role="menuitem">Overview</a>
+            <a href="#demographics" class="block nav-link px-4 py-2" role="menuitem">Demographics</a>
+            <a href="#findings" class="block nav-link px-4 py-2" role="menuitem">Findings</a>
+            <a href="#correlations" class="block nav-link px-4 py-2" role="menuitem">Correlations</a>
+            <a href="#advanced-visualizations" class="block nav-link px-4 py-2" role="menuitem">Advanced Charts</a>
+            <a href="#discussion" class="block nav-link px-4 py-2" role="menuitem">Discussion</a>
+            <a href="#ask" class="block nav-link px-4 py-2" role="menuitem">✨ Ask the Thesis</a>
+            <a href="#conclusion" class="block nav-link px-4 py-2" role="menuitem">Conclusion</a>
+        </div>
+        <!-- Search overlay -->
+        <div id="search-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="search-heading">
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 id="search-heading" class="text-lg font-semibold">Search Thesis Content</h3>
+                    <button id="close-search" class="p-2" aria-label="Close search" tabindex="0">
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <div class="mb-4">
+                    <input type="text" id="search-input" class="w-full p-3 border rounded-lg" placeholder="Enter search term..." aria-label="Search input">
+                </div>
+                <div id="search-results" class="max-h-96 overflow-y-auto" role="region" aria-live="polite"></div>
+            </div>
+        </div>
+    </nav>
+</header>
